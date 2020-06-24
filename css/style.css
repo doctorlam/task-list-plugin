@@ -1,0 +1,101 @@
+/**
+ * All of the CSS for your public-facing functionality should be
+ * included in this file.
+ */
+
+.task-list-table tr {
+    display: flex;
+    padding-bottom: 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #F4F4F4;
+}
+.task-list-table tr:last-child {
+    padding-bottom: 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    border-bottom: 0px solid #F4F4F4;
+}
+.task-list-table tr td {
+    text-align: left;
+    padding: 0 !important;
+}
+
+.page-template-all-upcoming .task-list-table tr td.left,.page-template-all-people .task-list-table tr td.left  {
+    width: 30%;
+}
+.page-template-all-upcoming .task-list-table tr td.right, .page-template-all-people .task-list-table tr td.right  {
+    width: 64%;
+    margin-left: 6%;
+}
+.task-list-table tr td.left {
+    color: #fff;
+    font-family: "Roboto", Sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    width: 36%;
+
+}
+.task-list-table tr td.right {
+    width: 58%;
+    margin-left: 6%;
+}
+.task-list-table tr td:last-child p:first-child {
+    margin-top: 0;
+	margin-bottom: 5px;
+}
+.task-list-table tr td:last-child h5 {
+    color: #000 !important;
+    font-family: "Roboto", Sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    margin-block-end: 0;
+    margin-block-start: 0;
+}
+.task-list-table .deadline{
+    color: #999;
+    font-family: "Roboto", Sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+	margin-top: 0;
+	margin-bottom: 0px;
+}
+.task-list-table tr td:first-child div {
+    padding: 8px 10px;
+    border-radius: 30px;
+    width: 95%;
+    text-align: center;
+}
+.yellowstatus {
+    background-color: #FFCC00;
+}
+.redstatus {
+    background-color: #f31817;
+}
+.greenstatus {
+    background-color: #3fc065;
+}
+.graystatus {
+    background-color: #ccc;
+}
+
+.button {
+      padding: 6px 8px;
+    border-radius: 30px;
+    text-align: center;
+    color: white;
+    width:200px;
+}
+
+.white-bg {
+    box-shadow: 5px 7px 25px -2px rgba(0, 0, 0, 0.12);
+    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+    margin: 12px 12px 12px 18px;
+    padding: 50px 50px 50px 50px; background-color: white;
+}
