@@ -408,6 +408,7 @@ function notify_admin( $post) {
        $users = get_field('assigned_to', $post_id);
      foreach( $users as $user ) {
 
+        $user_info = get_userdata( $user );
 
 
     //if $specific_users is an array and is not empty then send email. 
@@ -415,7 +416,7 @@ function notify_admin( $post) {
             $to = $author_email;
 
             $subject = 'A task you assigned has been marked as completed in the AM Culture Portal';
-            $message .= '<p>This is an automatic notification that a task you assigned to ' . $user->display_name . ' has been marked as completed.</p>';
+            $message .= '<p>This is an automatic notification that a task you assigned to ' . $user_info->display_name . ' has been marked as completed.</p>';
             $message .= '<p><strong>Task Name: </strong>' . get_the_title($post_id) . '</p>';
             $message .= '<p><strong>Deadline:</strong>' . get_field('end_date', $post_id) . '</p>';
             $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>Approve Task Completion &raquo;</strong></a></p>';
