@@ -16,40 +16,40 @@ add_action( 'wp_enqueue_scripts', 'wpse_load_plugin_css' );
 define('PLUGIN_DIR_PATH','templates');
 function cptui_register_my_cpts_task() {
 
-	/**
-	 * Post Type: Tasks.
-	 */
+  /**
+   * Post Type: Tasks.
+   */
 
-	$labels = [
-		"name" => __( "Tasks", "discoveram" ),
-		"singular_name" => __( "Task", "discoveram" ),
-	];
+  $labels = [
+    "name" => __( "Tasks", "discoveram" ),
+    "singular_name" => __( "Task", "discoveram" ),
+  ];
 
-	$args = [
-		"label" => __( "Tasks", "discoveram" ),
-		"labels" => $labels,
-		"description" => "",
-		"public" => true,
-		"publicly_queryable" => true,
-		"show_ui" => true,
-		"show_in_rest" => true,
-		"rest_base" => "",
-		"rest_controller_class" => "WP_REST_Posts_Controller",
-		"has_archive" => true,
-		"show_in_menu" => true,
-		"show_in_nav_menus" => true,
-		"delete_with_user" => false,
-		"exclude_from_search" => false,
-		"capability_type" => "post",
-		"map_meta_cap" => true,
-		"hierarchical" => true,
+  $args = [
+    "label" => __( "Tasks", "discoveram" ),
+    "labels" => $labels,
+    "description" => "",
+    "public" => true,
+    "publicly_queryable" => true,
+    "show_ui" => true,
+    "show_in_rest" => true,
+    "rest_base" => "",
+    "rest_controller_class" => "WP_REST_Posts_Controller",
+    "has_archive" => true,
+    "show_in_menu" => true,
+    "show_in_nav_menus" => true,
+    "delete_with_user" => false,
+    "exclude_from_search" => false,
+    "capability_type" => "post",
+    "map_meta_cap" => true,
+    "hierarchical" => true,
     'menu_icon'   => 'dashicons-editor-ol',
-		"rewrite" => [ "slug" => "task", "with_front" => true ],
-		"query_var" => true,
-		"supports" => [ "title", "editor", "thumbnail", "custom-fields", "comments", "revisions", "author" ],
-	];
+    "rewrite" => [ "slug" => "task", "with_front" => true ],
+    "query_var" => true,
+    "supports" => [ "title", "editor", "thumbnail", "custom-fields", "comments", "revisions", "author" ],
+  ];
 
-	register_post_type( "task", $args );
+  register_post_type( "task", $args );
 }
 
 add_action( 'init', 'cptui_register_my_cpts_task' );
@@ -57,35 +57,43 @@ add_action( 'init', 'cptui_register_my_cpts_task' );
  
 function cptui_register_my_taxes_list() {
 
-	/**
-	 * Taxonomy: Lists.
-	 */
+  /**
+   * Taxonomy: Lists.
+   */
 
-	$labels = [
-		"name" => __( "Lists", "discoveram" ),
-		"singular_name" => __( "List", "discoveram" ),
-	];
+  $labels = [
+    "name" => __( "Lists", "discoveram" ),
+    "singular_name" => __( "List", "discoveram" ),
+  ];
 
-	$args = [
-		"label" => __( "Lists", "discoveram" ),
-		"labels" => $labels,
-		"public" => true,
-		"publicly_queryable" => true,
-		"hierarchical" => true,
-		"show_ui" => true,
-		"show_in_menu" => true,
-		"show_in_nav_menus" => true,
-		"query_var" => true,
-		"rewrite" => [ 'slug' => 'list', 'with_front' => true, ],
-		"show_admin_column" => false,
-		"show_in_rest" => true,
-		"rest_base" => "list",
-		"rest_controller_class" => "WP_REST_Terms_Controller",
-		"show_in_quick_edit" => false,
-		];
-	register_taxonomy( "list", [ "task" ], $args );
+  $args = [
+    "label" => __( "Lists", "discoveram" ),
+    "labels" => $labels,
+    "public" => true,
+    "publicly_queryable" => true,
+    "hierarchical" => true,
+    "show_ui" => true,
+    "show_in_menu" => true,
+    "show_in_nav_menus" => true,
+    "query_var" => true,
+    "rewrite" => [ 'slug' => 'list', 'with_front' => true, ],
+    "show_admin_column" => false,
+    "show_in_rest" => true,
+    "rest_base" => "list",
+    "rest_controller_class" => "WP_REST_Terms_Controller",
+    "show_in_quick_edit" => false,
+    ];
+  register_taxonomy( "list", [ "task" ], $args );
 }
 add_action( 'init', 'cptui_register_my_taxes_list' );
+
+function my_force_login() {
+global $post;
+
+if (!is_user_logged_in()   ) {
+    wp_redirect('/login');
+    }
+}   
 
 
 function user_task_list_upcoming() {
@@ -100,9 +108,9 @@ function user_task_list_upcoming() {
                 'post_type' => 'task', 
                 'post_status' => 'publish', 
                 'posts_per_page' => 4, 
-                'meta_key'			=> 'end_date',
-				'orderby'			=> 'meta_value',
-				'order'				=> 'ASC',
+                'meta_key'      => 'end_date',
+        'orderby'     => 'meta_value',
+        'order'       => 'ASC',
                 'tax_query' => array(
                       array(
                           'taxonomy' => 'list',
@@ -124,7 +132,7 @@ function user_task_list_upcoming() {
               ); // arguments array
         // WP_Query
         $eq_query = new WP_Query( $args );
-        if ($eq_query->have_posts()) : // The Loop
+        if ($eq_query->have_posts() && is_user_logged_in() ) : // The Loop
         ?>
       <div class="whole-thing">
             <table class="task-list-table upcoming-table">
@@ -184,8 +192,10 @@ function user_task_list_upcoming() {
     });
 });
 </script> -->
-      <?php else :?>
-        No Tasks Assigned.
+     <?php elseif (is_user_logged_in() ) :?>
+        <p style="font-size: 14px;">There are no tasks currently assigned to you.</p>
+       <?php else :?>
+                <p style="font-size: 14px;">You must be logged in to view your tasks.</p>
 
 <?php endif; ?> 
 <?php
@@ -207,9 +217,9 @@ function user_task_list_people() {
                 'post_status' => 'publish', 
                 'posts_per_page' => 4, 
                 'paged' => $paged, 
-                 'meta_key'			=> 'end_date',
-				        'orderby'			=> 'meta_value',
-				        'order'				=> 'ASC',
+                 'meta_key'     => 'end_date',
+                'orderby'     => 'meta_value',
+                'order'       => 'ASC',
                 'tax_query' => array(
                       array(
                           'taxonomy' => 'list',
@@ -229,7 +239,7 @@ function user_task_list_people() {
               ); // arguments array
         // WP_Query
         $eq_query = new WP_Query( $args );
-        if ($eq_query->have_posts()) : // The Loop
+        if ($eq_query->have_posts() && is_user_logged_in() ) : // The Loop
         ?>
             <table class="task-list-table people-table">
               <?php 
@@ -270,8 +280,11 @@ function user_task_list_people() {
 
             <?php include(EQ_PAGING); ?>
         </div> -->
-            <?php else :?>
-        No Tasks Assigned.
+            <?php elseif (is_user_logged_in() ) :?>
+        <p style="font-size: 14px;">There are no tasks currently assigned to you.</p>
+       <?php else :?>
+                <p style="font-size: 14px;">You must be logged in to view your tasks.</p>
+
 <?php endif; ?> 
 
 <?php
@@ -355,13 +368,16 @@ function notify_growers( $post) {
       global $post;
       $author_id = $post->post_author;
      $users = get_field('assigned_to', $post_id);
+
+     
      foreach( $users as $user ) {
+      $user_info = get_userdata( $user );
 
 
 
     //if $specific_users is an array and is not empty then send email. 
        
-            $to = $user->user_email;
+            $to = $user_info->user_email;
 
             $subject = 'New Task created for you in the AM Culture Portal ';
             $message .= '<p>This is an automatic notification that you have been assigned a new task by ' . get_the_author_meta( 'display_name', $author_id ). '.</p>';
@@ -412,155 +428,155 @@ function notify_admin( $post) {
 
 class PageTemplater {
 
-	/**
-	 * A reference to an instance of this class.
-	 */
-	private static $instance;
+  /**
+   * A reference to an instance of this class.
+   */
+  private static $instance;
 
-	/**
-	 * The array of templates that this plugin tracks.
-	 */
-	protected $templates;
+  /**
+   * The array of templates that this plugin tracks.
+   */
+  protected $templates;
 
-	/**
-	 * Returns an instance of this class. 
-	 */
-	public static function get_instance() {
+  /**
+   * Returns an instance of this class. 
+   */
+  public static function get_instance() {
 
-		if ( null == self::$instance ) {
-			self::$instance = new PageTemplater();
-		} 
+    if ( null == self::$instance ) {
+      self::$instance = new PageTemplater();
+    } 
 
-		return self::$instance;
+    return self::$instance;
 
-	} 
+  } 
 
-	/**
-	 * Initializes the plugin by setting filters and administration functions.
-	 */
-	private function __construct() {
+  /**
+   * Initializes the plugin by setting filters and administration functions.
+   */
+  private function __construct() {
 
-		$this->templates = array();
-
-
-		// Add a filter to the attributes metabox to inject template into the cache.
-		if ( version_compare( floatval( get_bloginfo( 'version' ) ), '4.7', '<' ) ) {
-
-			// 4.6 and older
-			add_filter(
-				'page_attributes_dropdown_pages_args',
-				array( $this, 'register_project_templates' )
-			);
-
-		} else {
-
-			// Add a filter to the wp 4.7 version attributes metabox
-			add_filter(
-				'theme_page_templates', array( $this, 'add_new_template' )
-			);
-
-		}
-
-		// Add a filter to the save post to inject out template into the page cache
-		add_filter(
-			'wp_insert_post_data', 
-			array( $this, 'register_project_templates' ) 
-		);
+    $this->templates = array();
 
 
-		// Add a filter to the template include to determine if the page has our 
-		// template assigned and return it's path
-		add_filter(
-			'template_include', 
-			array( $this, 'view_project_template') 
-		);
+    // Add a filter to the attributes metabox to inject template into the cache.
+    if ( version_compare( floatval( get_bloginfo( 'version' ) ), '4.7', '<' ) ) {
+
+      // 4.6 and older
+      add_filter(
+        'page_attributes_dropdown_pages_args',
+        array( $this, 'register_project_templates' )
+      );
+
+    } else {
+
+      // Add a filter to the wp 4.7 version attributes metabox
+      add_filter(
+        'theme_page_templates', array( $this, 'add_new_template' )
+      );
+
+    }
+
+    // Add a filter to the save post to inject out template into the page cache
+    add_filter(
+      'wp_insert_post_data', 
+      array( $this, 'register_project_templates' ) 
+    );
 
 
-		// Add your templates to this array.
-		$this->templates = array(
-				
-				'templates/all-upcoming.php' => 'All Upcoming (Created by Custom Task List Plugin)',
+    // Add a filter to the template include to determine if the page has our 
+    // template assigned and return it's path
+    add_filter(
+      'template_include', 
+      array( $this, 'view_project_template') 
+    );
+
+
+    // Add your templates to this array.
+    $this->templates = array(
+        
+        'templates/all-upcoming.php' => 'All Upcoming (Created by Custom Task List Plugin)',
         'templates/all-people.php' => 'All People (Created by Custom Task List Plugin)',
 
-		);
-			
-	} 
+    );
+      
+  } 
 
-	/**
-	 * Adds our template to the page dropdown for v4.7+
-	 *
-	 */
-	public function add_new_template( $posts_templates ) {
-		$posts_templates = array_merge( $posts_templates, $this->templates );
-		return $posts_templates;
-	}
+  /**
+   * Adds our template to the page dropdown for v4.7+
+   *
+   */
+  public function add_new_template( $posts_templates ) {
+    $posts_templates = array_merge( $posts_templates, $this->templates );
+    return $posts_templates;
+  }
 
-	/**
-	 * Adds our template to the pages cache in order to trick WordPress
-	 * into thinking the template file exists where it doens't really exist.
-	 */
-	public function register_project_templates( $atts ) {
+  /**
+   * Adds our template to the pages cache in order to trick WordPress
+   * into thinking the template file exists where it doens't really exist.
+   */
+  public function register_project_templates( $atts ) {
 
-		// Create the key used for the themes cache
-		$cache_key = 'page_templates-' . md5( get_theme_root() . '/' . get_stylesheet() );
+    // Create the key used for the themes cache
+    $cache_key = 'page_templates-' . md5( get_theme_root() . '/' . get_stylesheet() );
 
-		// Retrieve the cache list. 
-		// If it doesn't exist, or it's empty prepare an array
-		$templates = wp_get_theme()->get_page_templates();
-		if ( empty( $templates ) ) {
-			$templates = array();
-		} 
+    // Retrieve the cache list. 
+    // If it doesn't exist, or it's empty prepare an array
+    $templates = wp_get_theme()->get_page_templates();
+    if ( empty( $templates ) ) {
+      $templates = array();
+    } 
 
-		// New cache, therefore remove the old one
-		wp_cache_delete( $cache_key , 'themes');
+    // New cache, therefore remove the old one
+    wp_cache_delete( $cache_key , 'themes');
 
-		// Now add our template to the list of templates by merging our templates
-		// with the existing templates array from the cache.
-		$templates = array_merge( $templates, $this->templates );
+    // Now add our template to the list of templates by merging our templates
+    // with the existing templates array from the cache.
+    $templates = array_merge( $templates, $this->templates );
 
-		// Add the modified cache to allow WordPress to pick it up for listing
-		// available templates
-		wp_cache_add( $cache_key, $templates, 'themes', 1800 );
+    // Add the modified cache to allow WordPress to pick it up for listing
+    // available templates
+    wp_cache_add( $cache_key, $templates, 'themes', 1800 );
 
-		return $atts;
+    return $atts;
 
-	} 
+  } 
 
-	/**
-	 * Checks if the template is assigned to the page
-	 */
-	public function view_project_template( $template ) {
-		
-		// Get global post
-		global $post;
+  /**
+   * Checks if the template is assigned to the page
+   */
+  public function view_project_template( $template ) {
+    
+    // Get global post
+    global $post;
 
-		// Return template if post is empty
-		if ( ! $post ) {
-			return $template;
-		}
+    // Return template if post is empty
+    if ( ! $post ) {
+      return $template;
+    }
 
-		// Return default template if we don't have a custom one defined
-		if ( ! isset( $this->templates[get_post_meta( 
-			$post->ID, '_wp_page_template', true 
-		)] ) ) {
-			return $template;
-		} 
+    // Return default template if we don't have a custom one defined
+    if ( ! isset( $this->templates[get_post_meta( 
+      $post->ID, '_wp_page_template', true 
+    )] ) ) {
+      return $template;
+    } 
 
-		$file = plugin_dir_path( __FILE__ ). get_post_meta( 
-			$post->ID, '_wp_page_template', true
-		);
+    $file = plugin_dir_path( __FILE__ ). get_post_meta( 
+      $post->ID, '_wp_page_template', true
+    );
 
-		// Just to be safe, we check if the file exist first
-		if ( file_exists( $file ) ) {
-			return $file;
-		} else {
-			echo $file;
-		}
+    // Just to be safe, we check if the file exist first
+    if ( file_exists( $file ) ) {
+      return $file;
+    } else {
+      echo $file;
+    }
 
-		// Return template
-		return $template;
+    // Return template
+    return $template;
 
-	}
+  }
 
 } 
 add_action( 'plugins_loaded', array( 'PageTemplater', 'get_instance' ) );

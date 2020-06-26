@@ -1,3 +1,5 @@
+<?php my_force_login(); ?>
+
 <?php
 /**
  * The Template for displaying all single posts.
@@ -10,10 +12,16 @@ get_header(); ?>
 
 
 <div id="maincontentcontainer">
+
 	<div id="primary" class="grid-container site-content" role="main">
-
-
 				<?php while ( have_posts() ) : the_post(); ?>
+				<?php 
+			 global $current_user;
+			 get_currentuserinfo();
+			  $current = $current_user->ID;
+			  $post_author_id = get_post_field( 'post_author', $post_id );
+			  $assigned = get_field('assigned_to');
+			  if ( in_array($current, $assigned ) || $post_author_id == $current ) :?>
 			<div class="grid-70">
 
 						<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -51,9 +59,11 @@ get_header(); ?>
 		$users = get_field('assigned_to');
 		if( $users ): ?>
 		<h3>Assigned to:
-		    <?php foreach( $users as $user ): ?>
+			<?php foreach( $users as $user ): 
+				$user_info = get_userdata( $user );
+				?>
 		        
-		       <?php echo $user->display_name; ?>
+		       <?php echo $user_info->display_name; ?>
 		       &nbsp;  &nbsp;
 
 		        
@@ -84,14 +94,13 @@ get_header(); ?>
 		</div><!-- white-bg-->
 	
 
-	<?php $args = array(
-		    'post_type'  => 'task',
-		    'author'     => get_current_user_id(),
-		);
+	<?php 
+	    global $current_user;
+		wp_get_current_user();
+		$post_author_id = get_post_field( 'post_author', $post_id );
 
-		$wp_posts = get_posts($args);
 
-	if (count($wp_posts)) :?>
+	if ($current_user->ID == $post_author_id) :?>
 		<div class="white-bg">
 			<h3>Confirm Task has been Completed</h3>
 
@@ -104,14 +113,16 @@ get_header(); ?>
 		</div>
 
 <?php endif; ?>
-<?php wp_reset_postdata(); ?>
 
 
 
 	</div><!-- grid-30-->
+	<?php else :?>
+		<p>This task is not associated with your account.</p>
+		<?php endif; ?>
 		<?php endwhile; // end of the loop. ?>
+		
 
-			
 
 	</div> <!-- /#primary.grid-container.site-content -->
 </div> <!-- /#maincontentcontainer -->

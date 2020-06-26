@@ -1,3 +1,5 @@
+<?php my_force_login(); ?>
+
  <?php /* Template Name: All People analyzers and reviews Task List Template */ 
  get_header(); 
 
@@ -38,13 +40,15 @@
 
         ?>
     <div class="container">
-
-        <h1 style="text-align: center">All of <?php echo $current_user->display_name; ?>'s People Analyzers & Reviews</h1>
-          <a href="/"><< Go Back Home</a>
-      <div class="whole-thing" style="box-shadow: 5px 7px 25px -2px rgba(0, 0, 0, 0.12);
-    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
-    margin: 12px 12px 12px 18px;
-    padding: 50px 50px 50px 50px; background-color: white; ">
+    <div class="title-row">
+      <div class="col-1">
+            <h1 style="text-align: left">My People Analyzers & Reviews</h1>
+      </div>
+      <div class="col-2">
+              <a href="/" class="back-btn">Back to Dashboard</a>
+      </div>
+    </div>
+      <div class="whole-thing">
             <table class="task-list-table upcoming-table">
               <?php 
               while ($eq_query->have_posts()): $eq_query->the_post();
@@ -100,14 +104,7 @@ a {
 .task-list-table {
   width: 100%;
 }
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  justify-content: center;
 
-}
 </style>
 <?php get_footer(); ?>
 
