@@ -2,7 +2,7 @@
 /*
   Plugin Name: Custom Task manager for AM
   Description: Custom Task manager for AM
-  Version: 1.0
+  Version: 2.0
   Author: Chris Lam Design
 */
 
@@ -87,6 +87,98 @@ function cptui_register_my_taxes_list() {
 }
 add_action( 'init', 'cptui_register_my_taxes_list' );
 
+// Add custom fields
+function my_acf_add_local_field_groups() {
+
+acf_add_local_field_group(
+  array(
+  'key' => 'journey_step',
+  'title' => 'Participant Level',
+  'fields' => array (
+    array (
+      'key' => 'participant_level',
+      'label' => 'Journey Step',
+      'name' => 'participant_level',
+      'type' => 'radio',
+      'choices' => array(
+        '1' => 'Step 1',
+        '2' => 'Step 2',
+        '3' => 'Step 3',
+        '4' => 'Step 4',
+        '5' => 'Complete',
+      ),
+    )
+  ),
+  'location' => array (
+    array (
+      array (
+        'param' => 'user_role',
+        'operator' => '==',
+        'value' => 'all',
+      ),
+    ),
+  ), // close main group array
+)); // close acf_add_local_field_group
+acf_add_local_field_group(
+
+  array(
+  'key' => 'task_list_fields',
+  'title' => 'Task List Fields',
+  'fields' => array (
+    array (
+      'key' => 'assigned_to',
+      'label' => 'Assigned To',
+      'name' => 'assigned_to',
+      'type' => 'user',
+      
+    ),
+    array (
+      'key' => 'end_date',
+      'label' => 'Deadline',
+      'name' => 'end_date',
+      'type' => 'date_time_picker',
+      'display_format' => 'F j, Y g:i a',
+      'return_format' => 'F j, Y g:i a',
+      
+    ),
+    array (
+      'key' => 'completed',
+      'label' => 'Completed?',
+      'name' => 'completed',
+      'type' => 'true_false',
+       'ui' => 1,
+        'ui_on_text' => 'Complete',
+        'ui_off_text' => 'Incomplete',
+      
+    ),
+    array (
+      'key' => 'confirmed_by_supervisor',
+      'label' => 'Confirmed By Supervisor',
+      'name' => 'confirmed_by_supervisor',
+      'type' => 'true_false',
+         'ui' => 1,
+        'ui_on_text' => 'Yes',
+        'ui_off_text' => 'No',
+
+      
+    ),
+  ),
+  'location' => array (
+    array (
+      array (
+        'param' => 'post_type',
+        'operator' => '==',
+        'value' => 'task',
+      ),
+    ),
+  ) // close main group array
+)); // close acf_add_local_field_group
+
+
+}
+add_action('acf/init', 'my_acf_add_local_field_groups');
+
+
 function my_force_login() {
 global $post;
 
@@ -103,6 +195,8 @@ function user_task_list_upcoming() {
         global $current_user;
            get_currentuserinfo();
             $assigned = $current_user->ID;
+  
+
             $paged = ( get_query_var('page') ) ? get_query_var('page') : 1;
             $args = array(
                 'post_type' => 'task', 
@@ -140,7 +234,7 @@ function user_task_list_upcoming() {
               while ($eq_query->have_posts()): $eq_query->the_post();
                 $current_date = date('Y-m-d');
                $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
-                $status = get_field('completed');
+                $status = get_field('confirmed_by_supervisor');
                 $deadline = get_field('end_date');
               ?>
 <tr>
@@ -367,17 +461,11 @@ function notify_growers( $post) {
    
       global $post;
       $author_id = $post->post_author;
-     $users = get_field('assigned_to', $post_id);
-
-     
-     foreach( $users as $user ) {
-      $user_info = get_userdata( $user );
-
-
+     $user = get_field('assigned_to', $post_id);
 
     //if $specific_users is an array and is not empty then send email. 
        
-            $to = $user_info->user_email;
+            $to = $user['user_email'];
 
             $subject = 'New Task created for you in the AM Culture Portal ';
             $message .= '<p>This is an automatic notification that you have been assigned a new task by ' . get_the_author_meta( 'display_name', $author_id ). '.</p>';
@@ -386,7 +474,7 @@ function notify_growers( $post) {
             $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>View Task &raquo;</strong></a></p>';
             wp_mail($to, $subject, $message );
         
-      }
+      
     }
 }
 
@@ -403,26 +491,22 @@ function notify_admin( $post) {
       $author_id = $post->post_author;
       $author_email = get_the_author_meta( 'user_email', $author_id );
       $completed = get_field('completed', $post_id);
-     
-     if ($completed == 'true') {
-       $users = get_field('assigned_to', $post_id);
-     foreach( $users as $user ) {
-
-        $user_info = get_userdata( $user );
-
-
+      $approved = get_field('confirmed_by_supervisor', $post_id);
+     if ($completed == 'true' && $approved != 'true') {
+       $user = get_field('assigned_to', $post_id);
+   
     //if $specific_users is an array and is not empty then send email. 
        
             $to = $author_email;
 
             $subject = 'A task you assigned has been marked as completed in the AM Culture Portal';
-            $message .= '<p>This is an automatic notification that a task you assigned to ' . $user_info->display_name . ' has been marked as completed.</p>';
+            $message .= '<p>This is an automatic notification that a task you assigned to ' . $user['display_name'] . ' has been marked as completed.</p>';
             $message .= '<p><strong>Task Name: </strong>' . get_the_title($post_id) . '</p>';
             $message .= '<p><strong>Deadline:</strong>' . get_field('end_date', $post_id) . '</p>';
             $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>Approve Task Completion &raquo;</strong></a></p>';
             wp_mail($to, $subject, $message );
         
-      }
+      
     }
   }
 }
@@ -581,6 +665,7 @@ class PageTemplater {
 
 } 
 add_action( 'plugins_loaded', array( 'PageTemplater', 'get_instance' ) );
+
 
 
 /* Filter the single_template with our custom function*/

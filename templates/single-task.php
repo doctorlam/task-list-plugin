@@ -35,39 +35,35 @@ get_header(); ?>
 	                $confirmed = get_field('confirmed_by_supervisor');
 	                ?>
 
-	                <?php if ($current_date<$deadlinecompare && $status == false) :?>
+	                <?php if ($current_date<$deadlinecompare && $confirmed == false) :?>
 	                     
 	                          <div class="graystatus button">Incomplete</div>
 	                      <?php endif; ?>
-	                    <?php if ($current_date>$deadlinecompare && $status == false):?>
+	                    <?php if ($current_date>$deadlinecompare && $confirmed == false):?>
 	                      <div class="redstatus button">Overdue</div>
 	                    <?php endif; ?>
-	                    <?php if ($current_date == $deadlinecompare && $status == false) :?>
+	                    <?php if ($current_date == $deadlinecompare && $confirmed == false) :?>
 	                          <div class="yellowstatus button">Due Today</div>
 	                  <?php endif; ?>
 	                <?php if ($status == true && $confirmed == false)  : ?>
-	                      <div class="greenstatus button">Complete</div>
+	                    
 	                      <p style="font-size:12px;margin-left: 10px">Awaiting Supervisor Confirmation</p>
 	                    <?php endif;?>
 	                    <?php if ($status == true && $confirmed == true ) : ?>
 	                    		<div class="greenstatus button">Complete</div>
 
-	                    	<div style="margin-left:10px" class="greenstatus button">Confirmed by Supervisor</div>
+	                    
 	                    <?php endif;?>
 	            </div><!-- d-flex-->
 				<?php
-		$users = get_field('assigned_to');
-		if( $users ): ?>
+		$user = get_field('assigned_to');
+		
+		if( $user ): ?>
 		<h3>Assigned to:
-			<?php foreach( $users as $user ): 
-				$user_info = get_userdata( $user );
-				?>
+				
+		     <?php echo $user['display_name']; ?>
+		   
 		        
-		       <?php echo $user_info->display_name; ?>
-		       &nbsp;  &nbsp;
-
-		        
-		    <?php endforeach; ?>
 		</h3>
 
 		<?php endif; ?>
@@ -80,10 +76,20 @@ get_header(); ?>
 
 	</article> <!-- /#post -->	
 </div> <!-- /.grid-70 -->
+
+		      
+
+		        
 	<div class="grid-30">
-		
+		<?php 
+			 global $current_user;
+			 get_currentuserinfo();
+			  $current = $current_user->ID;
+			  $post_author_id = get_post_field( 'post_author', $post_id );
+			  $assigned = get_field('assigned_to');
+			  if ( $post_author_id != $current ) :?>
 		<div class="white-bg">
-			<h3>Take Action on this Task</h3>
+			<h3>Have you completed this task?</h3>
 				
 				<?php acf_form(array(
 				    'post_id'   => $post_id,
@@ -92,17 +98,17 @@ get_header(); ?>
 				    'submit_value'  => 'Submit'
 				)); ?>
 		</div><!-- white-bg-->
-	
+	<?php endif; ?>
 
 	<?php 
 	    global $current_user;
 		wp_get_current_user();
 		$post_author_id = get_post_field( 'post_author', $post_id );
-
+		$user = get_field('assigned_to');
 
 	if ($current_user->ID == $post_author_id) :?>
-		<div class="white-bg">
-			<h3>Confirm Task has been Completed</h3>
+		<div class="blue-bg">
+			<h3>Has <?php echo $user['display_name']; ?> completed this task?</h3>
 
 	   		<?php acf_form(array(
 				    'post_id'   => $post_id,

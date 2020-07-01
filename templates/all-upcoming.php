@@ -54,7 +54,7 @@
               while ($eq_query->have_posts()): $eq_query->the_post();
                 $current_date = date('Y-m-d');
                $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
-                $status = get_field('completed');
+                $status = get_field('confirmed_by_supervisor');
                 $deadline = get_field('end_date');
               ?>
 <tr>
