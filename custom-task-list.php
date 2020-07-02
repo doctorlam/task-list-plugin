@@ -87,44 +87,26 @@ function cptui_register_my_taxes_list() {
 }
 add_action( 'init', 'cptui_register_my_taxes_list' );
 
+add_action( 'init', function() {
+remove_post_type_support( 'task', 'editor' );
+}, 99);
 // Add custom fields
 function my_acf_add_local_field_groups() {
 
-acf_add_local_field_group(
-  array(
-  'key' => 'journey_step',
-  'title' => 'Participant Level',
-  'fields' => array (
-    array (
-      'key' => 'participant_level',
-      'label' => 'Journey Step',
-      'name' => 'participant_level',
-      'type' => 'radio',
-      'choices' => array(
-        '1' => 'Step 1',
-        '2' => 'Step 2',
-        '3' => 'Step 3',
-        '4' => 'Step 4',
-        '5' => 'Complete',
-      ),
-    )
-  ),
-  'location' => array (
-    array (
-      array (
-        'param' => 'user_role',
-        'operator' => '==',
-        'value' => 'all',
-      ),
-    ),
-  ), // close main group array
-)); // close acf_add_local_field_group
+
 acf_add_local_field_group(
 
   array(
   'key' => 'task_list_fields',
   'title' => 'Task List Fields',
   'fields' => array (
+     array (
+      'key' => 'task_description',
+      'label' => 'Task Description',
+      'name' => 'task_description',
+      'type' => 'wysiwyg',
+      
+    ),
     array (
       'key' => 'assigned_to',
       'label' => 'Assigned To',
@@ -460,8 +442,10 @@ function notify_growers( $post) {
     //if email not sent then get an array of users to email
    
       global $post;
+      $content = $post->post_content;
       $author_id = $post->post_author;
      $user = get_field('assigned_to', $post_id);
+     
 
     //if $specific_users is an array and is not empty then send email. 
        
@@ -471,6 +455,7 @@ function notify_growers( $post) {
             $message .= '<p>This is an automatic notification that you have been assigned a new task by ' . get_the_author_meta( 'display_name', $author_id ). '.</p>';
             $message .= '<p><strong>Task Name: </strong>' . get_the_title($post_id) . '</p>';
             $message .= '<p><strong>Deadline:</strong>' . get_field('end_date', $post_id) . '</p>';
+            $message .= '<p><strong>Task Details:</strong>' . get_field('task_description', $post_id) . '</p>';
             $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>View Task &raquo;</strong></a></p>';
             wp_mail($to, $subject, $message );
         
@@ -503,6 +488,7 @@ function notify_admin( $post) {
             $message .= '<p>This is an automatic notification that a task you assigned to ' . $user['display_name'] . ' has been marked as completed.</p>';
             $message .= '<p><strong>Task Name: </strong>' . get_the_title($post_id) . '</p>';
             $message .= '<p><strong>Deadline:</strong>' . get_field('end_date', $post_id) . '</p>';
+            $message .= '<p><strong>Task Details:</strong>' . get_field('task_description', $post_id) . '</p>';
             $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>Approve Task Completion &raquo;</strong></a></p>';
             wp_mail($to, $subject, $message );
         

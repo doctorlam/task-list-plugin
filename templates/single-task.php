@@ -27,7 +27,6 @@ get_header(); ?>
 						<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 			<header class="white-bg">
 				<div style="display:flex; align-items: center">
-					<h1 style="margin-right: 24px"><?php the_title(); ?></h1>
 					<?php  $current_date = date('Y-m-d');
 	               $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
 	                $status = get_field('completed');
@@ -55,6 +54,7 @@ get_header(); ?>
 	                    
 	                    <?php endif;?>
 	            </div><!-- d-flex-->
+					<h1 style="margin-right: 24px"><?php the_title(); ?></h1>
 				<?php
 		$user = get_field('assigned_to');
 		
@@ -70,7 +70,7 @@ get_header(); ?>
 		<p><span style="font-weight: 700">Start Date:</span> <?php the_date(); ?></p>
 		<p><span style="font-weight: 700">Deadline:</span> <?php the_field('end_date') ;?></p>
 		<br>
-		<?php the_content(); ?>
+		<?php the_field('task_description'); ?>
 				
 			</header>
 
