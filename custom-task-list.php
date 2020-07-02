@@ -91,7 +91,7 @@ add_action( 'init', function() {
 remove_post_type_support( 'task', 'editor' );
 }, 99);
 // Add custom fields
-function my_acf_add_local_field_groups() {
+function my_acf_add_local_field_groups_tasks() {
 
 
 acf_add_local_field_group(
@@ -158,7 +158,7 @@ acf_add_local_field_group(
 
 
 }
-add_action('acf/init', 'my_acf_add_local_field_groups');
+add_action('acf/init', 'my_acf_add_local_field_groups_tasks');
 
 
 function my_force_login() {
