@@ -1,10 +1,10 @@
 <?php my_force_login(); ?>
 
- <?php /* Template Name: All Upcoming Task List Page Template */ 
+ <?php /* Template Name: All Combined Task List Page Template */ 
  get_header(); 
 
   global $current_user;
-           get_currentuserinfo();
+           wp_get_current_user();
             $assigned = $current_user->ID;
             $paged = ( get_query_var('page') ) ? get_query_var('page') : 1;
             $args = array(
@@ -40,14 +40,14 @@
 
         ?>
     <div class="container">
-    <div class="title-row">
-      <div class="col-1">
-            <h1 style="text-align: left">My Upcoming Conversations</h1>
-      </div>
-      <div class="col-2">
+		<div class="title-row">
+			<div class="col-1">
+        		<h1 style="text-align: left">My Upcoming Conversations</h1>
+			</div>
+			<div class="col-2">
               <a href="/" class="back-btn">Back to Dashboard</a>
-      </div>
-    </div>
+			</div>
+		</div>
       <div class="whole-thing">
             <table class="task-list-table upcoming-table">
               <?php 

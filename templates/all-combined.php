@@ -1,6 +1,6 @@
 <?php my_force_login(); ?>
 
- <?php /* Template Name: All People analyzers and reviews Task List Template */ 
+ <?php /* Template Name: All Upcoming Task List Page Template */ 
  get_header(); 
 
   global $current_user;
@@ -14,19 +14,26 @@
                   'meta_key'      => 'end_date',
                 'orderby'     => 'meta_value',
                 'order'       => 'ASC',
-                'tax_query' => array(
-                      array(
-                          'taxonomy' => 'list',
-                          'field' => 'slug',
-                          'terms' => 'people-analyzers-reviews'
-                      )
-                    ), // end tax query
+               
                    'meta_query' => array(
+                    'relation' => 'OR',
                       array(
                           'key' => 'assigned_to',
                           'compare' => 'LIKE',
                           'value' => $assigned
-                      )
+                      ), 
+                      array (
+                      
+                          'key' => 'supervisor',
+                          'compare' => 'LIKE',
+                          'value' => $assigned,
+                      ),
+
+                      array(
+                          'key' => 'form_for',
+                          'compare' => 'LIKE',
+                          'value' => $assigned
+                      ),
                     ), // end tax query
                   'paged' => $paged, 
 
@@ -42,7 +49,7 @@
     <div class="container">
 		<div class="title-row">
 			<div class="col-1">
-        		<h1 style="text-align: left">My People Analyzers & Reviews</h1>
+        		<h1 style="text-align: left">All Tasks</h1>
 			</div>
 			<div class="col-2">
               <a href="/" class="back-btn">Back to Dashboard</a>
@@ -74,10 +81,50 @@
 
                 <?php endif; ?>
                </td>
-                  <td class="right"><a href="<?php the_permalink(); ?>"><h5><?php the_title(); ?><br>
+                <td class="right">
+                     <a href="<?php the_permalink(); ?>">
+                  <?php 
+                 global $current_user;
+                wp_get_current_user();
+                $current = $current_user->ID;
+                $tasktype = get_field('form_task');
+                $supervisor = get_field('supervisor');
+                $attendee = get_field('form_for');
+                $reviewers = get_field('assigned_to');
+
+               if($tasktype == 'Quarterly Conversation' && $current == $supervisor[ID]) : ?>
+                  <h5>Quarterly Conversation  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
-                  </h5></a>  
+                  </h5>
+
+              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee[ID]) : ?><h5>Quarterly Conversation  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor[ID]) : ?><h5>Annual Review  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee[ID]) : ?><h5>Annual Review  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+
+                 <?php elseif($tasktype == 'Quarterly Conversation' || 'Annual Review' && in_array($current,$reviewers)) : ?><h5>People Analyzer  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+
+                <?php else : ?>
+
+                  <h5><?php the_title(); ?>  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                <?php endif; ?>
+
+                </a>  
                
                  </td>
                    
@@ -98,13 +145,12 @@ a {
 }  
 .whole-thing {
   max-width: 480px;
-    width: 100%;
   margin: 0 auto;
+  width: 100%;
 }
 .task-list-table {
   width: 100%;
 }
-
 </style>
 <?php get_footer(); ?>
 
