@@ -16,82 +16,80 @@ add_action( 'wp_enqueue_scripts', 'wpse_load_plugin_css' );
 define('PLUGIN_DIR_PATH','templates');
 function cptui_register_my_cpts_task() {
 
-	/**
-	 * Post Type: Tasks.
-	 */
+  /**
+   * Post Type: Tasks.
+   */
 
-	$labels = [
-		"name" => __( "Tasks", "discoveram" ),
-		"singular_name" => __( "Task", "discoveram" ),
-	];
+  $labels = [
+    "name" => __( "Tasks", "discoveram" ),
+    "singular_name" => __( "Task", "discoveram" ),
+  ];
 
-	$args = [
-		"label" => __( "Tasks", "discoveram" ),
-		"labels" => $labels,
-		"description" => "",
-		"public" => true,
-		"publicly_queryable" => true,
-		"show_ui" => true,
-		"show_in_rest" => true,
-		"rest_base" => "",
-		"rest_controller_class" => "WP_REST_Posts_Controller",
-		"has_archive" => true,
-		"show_in_menu" => true,
-		"show_in_nav_menus" => true,
-		"delete_with_user" => false,
-		"exclude_from_search" => false,
-		"capability_type" => "post",
-		"map_meta_cap" => true,
-		"hierarchical" => true,
+  $args = [
+    "label" => __( "Tasks", "discoveram" ),
+    "labels" => $labels,
+    "description" => "",
+    "public" => true,
+    "publicly_queryable" => true,
+    "show_ui" => true,
+    "show_in_rest" => true,
+    "rest_base" => "",
+    "rest_controller_class" => "WP_REST_Posts_Controller",
+    "has_archive" => true,
+    "show_in_menu" => true,
+    "show_in_nav_menus" => true,
+    "delete_with_user" => false,
+    "exclude_from_search" => false,
+    "capability_type" => "post",
+    "map_meta_cap" => true,
+    "hierarchical" => true,
     'menu_icon'   => 'dashicons-editor-ol',
-		"rewrite" => [ "slug" => "task", "with_front" => true ],
-		"query_var" => true,
-		"supports" => [ "title", "editor", "thumbnail", "custom-fields", "comments", "revisions", "author" ],
-	];
+    "rewrite" => [ "slug" => "task", "with_front" => true ],
+    "query_var" => true,
+    "supports" => [ "title", "editor", "thumbnail", "custom-fields", "comments", "revisions", "author" ],
+  ];
 
-	register_post_type( "task", $args );
+  register_post_type( "task", $args );
 }
 
 add_action( 'init', 'cptui_register_my_cpts_task' );
 
  
-// function cptui_register_my_taxes_list() {
+function cptui_register_my_taxes_list() {
 
-	/**
-	 * Taxonomy: Lists.
-	 */
+  /**
+   * Taxonomy: Lists.
+   */
 
-//	$labels = [
- //		"name" => __( "Lists", "discoveram" ),
-//		"singular_name" => __( "List", "discoveram" ),
-//	];
+  $labels = [
+    "name" => __( "Lists", "discoveram" ),
+    "singular_name" => __( "List", "discoveram" ),
+  ];
 
-//	$args = [
-//		"label" => __( "Lists", "discoveram" ),
-//		"labels" => $labels,
-//		"public" => true,
-//		"publicly_queryable" => true,
-//		"hierarchical" => true,
-//		"show_ui" => true,
-//		"show_in_menu" => true,
-//		"show_in_nav_menus" => true,
-//		"query_var" => true,
-//		"rewrite" => [ 'slug' => 'list', 'with_front' => true, ],
-//		"show_admin_column" => false,
-//		"show_in_rest" => true,
-//		"rest_base" => "list",
-//		"rest_controller_class" => "WP_REST_Terms_Controller",
-//		"show_in_quick_edit" => false,
-//		];
-//	register_taxonomy( "list", [ "task" ], $args );
-//}
-//add_action( 'init', 'cptui_register_my_taxes_list' );
+  $args = [
+    "label" => __( "Lists", "discoveram" ),
+    "labels" => $labels,
+    "public" => true,
+    "publicly_queryable" => true,
+    "hierarchical" => true,
+    "show_ui" => true,
+    "show_in_menu" => true,
+    "show_in_nav_menus" => true,
+    "query_var" => true,
+    "rewrite" => [ 'slug' => 'list', 'with_front' => true, ],
+    "show_admin_column" => false,
+    "show_in_rest" => true,
+    "rest_base" => "list",
+    "rest_controller_class" => "WP_REST_Terms_Controller",
+    "show_in_quick_edit" => false,
+    ];
+  register_taxonomy( "list", [ "task" ], $args );
+}
+add_action( 'init', 'cptui_register_my_taxes_list' );
 
 add_action( 'init', function() {
 remove_post_type_support( 'task', 'editor' );
 }, 99);
-
-
 // Add custom fields
 function my_acf_add_local_field_groups_tasks() {
 
@@ -102,110 +100,56 @@ acf_add_local_field_group(
   'key' => 'task_list_fields',
   'title' => 'Task List Fields',
   'fields' => array (
-  	  array (
+    
+    array (
+      'key' => 'assigned_to',
+      'label' => 'Assigned To',
+      'name' => 'assigned_to',
+      'type' => 'user',
+      
+    ),
+      array (
       'key' => 'form_task',
-      'label' => 'What type of task is this?',
+      'label' => 'Is this task related to a form?',
       'name' => 'form_task',
       'type' => 'radio',
       'layout' => 'vertical',
-      'return_format' => 'label',
+      'return_format' => 'value',
       'choices' => array(
-      		'none' => 'Standard Task',
-          'quarterly_conversation' => 'Quarterly Conversation',
+      		'none' => 'No Form',
+          'people_analyzers' => 'People Analyzers',
           'annual_review' => 'Annual Review',
-          'net_promoter_score' => 'Net Promoter Score',
       ),
       'wrapper' => array (
-        'width' => '33%',
+        'width' => '50%',
           'class' => '',
         'id' => '',
       ),
       'default_value' => 'none',
       
     ),
-  	 array (
-      'key' => 'supervisor',
-      'label' => 'Supervisor',
-      'name' => 'supervisor',
-      'type' => 'user',
-     // 'role' => 'supervisor',
-      'conditional_logic' => 
-      array(
-      	array(
-	        'field' => 'form_task',
-	        'value' => 1,
-	        'operator' => '!=',
-	        'value' => 'none',
-	       ),
-      	array(
-	         'field' => 'form_task',
-	        'value' => 1,
-	        'operator' => '!=',
-	        'value' => 'net_promoter_score',
-    	),
-
-      ),
-       'wrapper' => array (
-        'width' => '33%',
-          'class' => '',
-        'id' => '',
-      ),
-      
-    ),
-  	   array (
+    array (
       'key' => 'form_for',
-      'label' => 'Attendee?',
+      'label' => 'Who is the form for?',
       'name' => 'form_for',
       'type' => 'user',
-
-      'conditional_logic' => 
-      array(
-      	array(
-	        'field' => 'form_task',
-	        'value' => 1,
-	        'operator' => '!=',
-	        'value' => 'none',
-	       ),
-      	array(
-	         'field' => 'form_task',
-	        'value' => 1,
-	        'operator' => '!=',
-	        'value' => 'net_promoter_score',
-    	),
-
-      ),
-       'wrapper' => array (
-        'width' => '33%',
+      'wrapper' => array (
+        'width' => '50%',
           'class' => '',
         'id' => '',
       ),
-      
-    ),
-     array (
-      'key' => 'task_description',
-      'label' => 'Task Description',
-      'name' => 'task_description',
-      'type' => 'wysiwyg',
-       'conditional_logic' => array(
-        'field' => 'form_task',
-        'value' => 1,
-        'operator' => '==',
-        'value' => 'none',
-      ),
 
+      'conditional_logic' => array(
+        'field' => 'form_task',
+         'operator' => '!=',
+         'value' => 'none',
+      ),
       
     ),
-    array (
-      'key' => 'assigned_to',
-      'label' => 'Assigned To',
-      'name' => 'assigned_to',
-      'type' => 'user',
-      'multiple' => 1, 
-      'return_format' => 'ID',
-      
-    ),
-  
     
+
+
+  
     array (
       'key' => 'end_date',
       'label' => 'Deadline',
@@ -213,6 +157,13 @@ acf_add_local_field_group(
       'type' => 'date_time_picker',
       'display_format' => 'F j, Y g:i a',
       'return_format' => 'F j, Y g:i a',
+      
+    ),
+     array (
+      'key' => 'task_description',
+      'label' => 'Task Description',
+      'name' => 'task_description',
+      'type' => 'wysiwyg',
       
     ),
     array (
@@ -267,7 +218,7 @@ function user_task_list_upcoming() {
     global $paged;
 
         global $current_user;
-           wp_get_current_user();
+           get_currentuserinfo();
             $assigned = $current_user->ID;
   
 
@@ -276,9 +227,9 @@ function user_task_list_upcoming() {
                 'post_type' => 'task', 
                 'post_status' => 'publish', 
                 'posts_per_page' => 4, 
-                'meta_key'			=> 'end_date',
-				'orderby'			=> 'meta_value',
-				'order'				=> 'ASC',
+                'meta_key'      => 'end_date',
+        'orderby'     => 'meta_value',
+        'order'       => 'ASC',
                 'tax_query' => array(
                       array(
                           'taxonomy' => 'list',
@@ -289,9 +240,9 @@ function user_task_list_upcoming() {
                    'meta_query' => array(
                       array(
                           'key' => 'assigned_to',
-                          'compare' => 'LIKE',
-                          'value' => $assigned,
-                      ),
+                          'compare' => '==',
+                          'value' => $assigned
+                      )
                     ), // end tax query
                   'paged' => $paged, 
 
@@ -328,7 +279,6 @@ function user_task_list_upcoming() {
 
                 <?php endif; ?>
                </td>
-
                   <td class="right"><a href="<?php the_permalink(); ?>"><h5><?php the_title(); ?><br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
@@ -364,7 +314,7 @@ function user_task_list_upcoming() {
      <?php elseif (is_user_logged_in() ) :?>
         <p style="font-size: 14px;">There are no tasks currently assigned to you.</p>
        <?php else :?>
-       	        <p style="font-size: 14px;">You must be logged in to view your tasks.</p>
+                <p style="font-size: 14px;">You must be logged in to view your tasks.</p>
 
 <?php endif; ?> 
 <?php
@@ -378,7 +328,7 @@ add_shortcode('user_task_list_upcoming', 'user_task_list_upcoming');
 function user_task_list_people() {
     ob_start();
         global $current_user;
-           wp_get_current_user();
+           get_currentuserinfo();
             $assigned = $current_user->ID;
             $paged = (get_query_var('paged')) ? get_query_var('paged') : 1; 
             $args = array(
@@ -386,9 +336,9 @@ function user_task_list_people() {
                 'post_status' => 'publish', 
                 'posts_per_page' => 4, 
                 'paged' => $paged, 
-                 'meta_key'			=> 'end_date',
-				        'orderby'			=> 'meta_value',
-				        'order'				=> 'ASC',
+                 'meta_key'     => 'end_date',
+                'orderby'     => 'meta_value',
+                'order'       => 'ASC',
                 'tax_query' => array(
                       array(
                           'taxonomy' => 'list',
@@ -399,7 +349,7 @@ function user_task_list_people() {
                    'meta_query' => array(
                       array(
                           'key' => 'assigned_to',
-                          'compare' => 'LIKE',
+                          'compare' => '==',
                           'value' => $assigned
                       )
                     ), // end tax query
@@ -452,7 +402,7 @@ function user_task_list_people() {
             <?php elseif (is_user_logged_in() ) :?>
         <p style="font-size: 14px;">There are no tasks currently assigned to you.</p>
        <?php else :?>
-       	        <p style="font-size: 14px;">You must be logged in to view your tasks.</p>
+                <p style="font-size: 14px;">You must be logged in to view your tasks.</p>
 
 <?php endif; ?> 
 
@@ -463,199 +413,8 @@ $content = ob_get_clean();
 
 add_shortcode('user_task_list_people', 'user_task_list_people'); ?>
 
-<?php 
-function user_task_list_combined() {
-    ob_start();
-        global $current_user;
-           wp_get_current_user();
-            $assigned = $current_user->ID;
-            $supervisor = get_field('supervisor');
-            $paged = (get_query_var('paged')) ? get_query_var('paged') : 1; 
-            $args = array(
-                'post_type' => 'task', 
-                'post_status' => 'publish', 
-                'posts_per_page' => 4, 
-                'paged' => $paged, 
-                 'meta_key'     => 'end_date',
-                'orderby'     => 'meta_value',
-                'order'       => 'ASC',
-                  
-                   'meta_query' => array(
-                    'relation' => 'OR',
-                      array(
-                          'key' => 'assigned_to',
-                          'compare' => 'LIKE',
-                          'value' => $assigned
-                      ), 
-                      array (
-                      
-                          'key' => 'supervisor',
-                          'compare' => 'LIKE',
-                          'value' => $assigned,
-                      ),
-
-                      array(
-                          'key' => 'form_for',
-                          'compare' => 'LIKE',
-                          'value' => $assigned
-                      ),
-
-                    ), // end tax query
-
-
-              ); // arguments array
-        // WP_Query
-        $eq_query = new WP_Query( $args );
-        if ($eq_query->have_posts() && is_user_logged_in() ) : // The Loop
-        ?>
-            <table class="task-list-table people-table">
-              <?php 
-              while ($eq_query->have_posts()): $eq_query->the_post();
-                $current_date = date('Y-m-d');
-               $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
-                $status = get_field('completed');
-                $deadline = get_field('end_date');
-              ?>
-                <tr>
-                  <td class="left">
-                     <?php if ($current_date<$deadlinecompare && $status == false) :?>
-                     
-                          <div class="graystatus">Incomplete</div>
-                      <?php endif; ?>
-                    <?php if ($current_date>$deadlinecompare && $status == false):?>
-                      <div class="redstatus">Overdue</div>
-                    <?php endif; ?>
-                    <?php if ($current_date == $deadlinecompare && $status == false) :?>
-                          <div class="yellowstatus">Due Today</div>
-                  <?php endif; ?>
-                <?php if ($status == true) : ?>
-                      <div class="greenstatus">Complete</div>
-
-                <?php endif; ?>
-               </td>
-                <td class="right">
-                     <a href="<?php the_permalink(); ?>">
-                <?php 
-                 global $current_user;
-                wp_get_current_user();
-                $current = $current_user->ID;
-                $tasktype = get_field('form_task');
-                $supervisor = get_field('supervisor');
-                $attendee = get_field('form_for');
-                $reviewers = get_field('assigned_to');
-
-               if($tasktype == 'Quarterly Conversation' && $current == $supervisor[ID]) : ?>
-                  <h5>Quarterly Conversation  <br>
-                    <span class="deadline"><?php echo $deadline; ?></span>
-                    
-                  </h5>
-
-              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee[ID]) : ?><h5>Quarterly Conversation  <br>
-                    <span class="deadline"><?php echo $deadline; ?></span>
-                    
-                  </h5>
-                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor[ID]) : ?><h5>Annual Review  <br>
-                    <span class="deadline"><?php echo $deadline; ?></span>
-                    
-                  </h5>
-                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee[ID]) : ?><h5>Annual Review  <br>
-                    <span class="deadline"><?php echo $deadline; ?></span>
-                    
-                  </h5>
-
-                 <?php elseif($tasktype == 'Quarterly Conversation' || 'Annual Review' && in_array($current,$reviewers)) : ?><h5>People Analyzer  <br>
-                    <span class="deadline"><?php echo $deadline; ?></span>
-                    
-                  </h5>
-
-                <?php else : ?>
-
-                  <h5><?php the_title(); ?>  <br>
-                    <span class="deadline"><?php echo $deadline; ?></span>
-                    
-                  </h5>
-                <?php endif; ?>
-
-                  </a>  
-               
-                 </td>
-                   
-                </tr>
-            <?php endwhile; wp_reset_query(); ?> 
-            </table>
-      <!-- <div class="people-table-link">
-
-            <?php include(EQ_PAGING); ?>
-        </div> -->
-            <?php elseif (is_user_logged_in() ) :?>
-        <p style="font-size: 14px;">There are no tasks currently assigned to you.</p>
-       <?php else :?>
-                <p style="font-size: 14px;">You must be logged in to view your tasks.</p>
-
-<?php endif; ?> 
 
 <?php
-$content = ob_get_clean();
-        return $content;
-}
-
-add_shortcode('user_task_list_combined', 'user_task_list_combined'); ?>
-
-
-<?php
-
-
-function misha_my_load_more_scripts() {
- 
-  global $wp_query; 
- 
-  // In most cases it is already included on the page and this line can be removed
-  wp_enqueue_script('jquery');
- 
-  // register our main script but do not enqueue it yet
-  wp_register_script( 'my_loadmore', plugin_dir_url( __FILE__ ) . 'js/myloadmore.js', array('jquery') );
- 
-
- 
-  wp_enqueue_script( 'my_loadmore' );
-}
- 
-add_action( 'wp_enqueue_scripts', 'misha_my_load_more_scripts' );
-
-
-
-
-function misha_loadmore_ajax_handler(){
- 
-  // prepare our arguments for the query
-  $args = json_decode( stripslashes( $_POST['query'] ), true );
-  $args['paged'] = $_POST['page'] + 1; // we need next page to be loaded
-  $args['post_status'] = 'publish';
- 
-  // it is always better to use WP_Query but not here
-  query_posts( $args );
- 
-  if( have_posts() ) :
- 
-    // run the loop
-    while( have_posts() ): ?>
-    <?php the_post(); ?>
-     <?php the_title(); ?>
- 
- 
-  <?php  endwhile; ?>
-<?php
- 
-  endif;
-  die; // here we exit the script and even no wp_reset_query() required!
-}
- 
- 
-
-  
-add_action('wp_ajax_loadmore', 'misha_loadmore_ajax_handler'); // wp_ajax_{action}
-add_action('wp_ajax_nopriv_loadmore', 'misha_loadmore_ajax_handler'); // wp_ajax_nopriv_{action}
-
 
  function wpse27856_set_content_type(){
     return "text/html";
@@ -669,259 +428,216 @@ function notify_growers( $post) {
     //if NOT post type 'grower_posts' then exit;
     if(( $_POST['post_status'] == 'publish' ) && ( $_POST['original_post_status'] != 'publish' ) && get_post_type($post_id) == 'task')  {   
  
- global $post;
-      $author_id = $post->post_author;
-     $reviewers = get_field('assigned_to', $post_id);
-      $tasktype = get_field('form_task', $post_id);
-         
-            $subject = 'New Task created for you in the AM Culture Portal ';
-            $message .= '<p>This is an automatic notification that you have been assigned a new task.</p>';
-            $message .= '<p><strong>Task Name: </strong>' . get_the_title($post_id) . '</p>';
-      if ($task_type == "Quarterly Conversation" || "Annual Review") {
-          $message .= '<p><strong>Task Type: </strong>People Analyzer</p>';
-       }   else {
-             $message .= '<p><strong>Task Type: </strong>' . get_field('form_task', $post_id) . '</p>';
-          }
-            $message .= '<p><strong>Deadline:</strong>' . get_field('end_date', $post_id) . '</p>';
-            $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>View Task &raquo;</strong></a></p>';
-        
-             foreach ( $reviewers as $reviewer ) {
-              $user_info = get_userdata( $reviewer );
-              $email = $user_info->user_email;
 
-                wp_mail( $email, $subject, $message );
-            }
+    //if email not sent then get an array of users to email
+   
+      global $post;
+      $content = $post->post_content;
+      $author_id = $post->post_author;
+     $user = get_field('assigned_to', $post_id);
+     
+
+    //if $specific_users is an array and is not empty then send email. 
+       
+            $to = $user['user_email'];
+
+            $subject = 'New Task created for you in the AM Culture Portal ';
+            $message .= '<p>This is an automatic notification that you have been assigned a new task by ' . get_the_author_meta( 'display_name', $author_id ). '.</p>';
+            $message .= '<p><strong>Task Name: </strong>' . get_the_title($post_id) . '</p>';
+            $message .= '<p><strong>Deadline:</strong>' . get_field('end_date', $post_id) . '</p>';
+            $message .= '<div class=\"task_description"\><p><strong>Task Details:</strong>' . get_field('task_description', $post_id) . '</p></div>';
+            $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>View Task &raquo;</strong></a></p>';
+            wp_mail($to, $subject, $message );
         
+      
     }
 }
+
 add_action('acf/save_post', 'notify_admin');
 
 function notify_admin( $post) {
     //if NOT post type 'grower_posts' then exit;
- if(( $_POST['post_status'] == 'publish' ) && ( $_POST['original_post_status'] != 'publish' ) && get_post_type($post_id) == 'task')  {    
+    if( get_post_type($post_id) == 'task')  {   
+ 
 
     //if email not sent then get an array of users to email
    
       global $post;
-     // $author_id = $post->post_author;
-     // $author_email = get_the_author_meta( 'user_email', $author_id );
-     // $completed = get_field('completed', $post_id);
-     // $approved = get_field('confirmed_by_supervisor', $post_id);
-    // if ($completed == 'true' && $approved != 'true') {
-       $users = get_field('assigned_to', $post_id);
-       $supervisor = get_field('supervisor', $post_id);
-       $super_email = $supervisor[user_email];
+      $author_id = $post->post_author;
+      $author_email = get_the_author_meta( 'user_email', $author_id );
+      $completed = get_field('completed', $post_id);
+      $approved = get_field('confirmed_by_supervisor', $post_id);
+     if ($completed == 'true' && $approved != 'true') {
+       $user = get_field('assigned_to', $post_id);
    
     //if $specific_users is an array and is not empty then send email. 
        
-            $to = $super_email;
+            $to = $author_email;
 
-            $subject = 'You have been set as the Supervisor in the SW Culture Portal';
-            $message .= '<p>This is an automatic notification that you have been selected as the supervisor for the task below.</p>';
+            $subject = 'A task you assigned has been marked as completed in the AM Culture Portal';
+            $message .= '<p>This is an automatic notification that a task you assigned to ' . $user['display_name'] . ' has been marked as completed.</p>';
             $message .= '<p><strong>Task Name: </strong>' . get_the_title($post_id) . '</p>';
-            $message .= '<p><strong>Task Type: </strong>' . get_field('form_task', $post_id) . '</p>';
-
             $message .= '<p><strong>Deadline:</strong>' . get_field('end_date', $post_id) . '</p>';
-            $message .= '<p><strong>Task Details:</strong>' . get_field('task_description', $post_id) . '</p>';
-             $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>View Task &raquo;</strong></a></p>';
-           
+            $message .= '<div class="task_description"><p><strong>Task Details:</strong>' . get_field('task_description', $post_id) . '</p></div>';
+            $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>Approve Task Completion &raquo;</strong></a></p>';
             wp_mail($to, $subject, $message );
         
       
-    // }
-  }
-}
-
-add_action('acf/save_post', 'notify_attendee');
-
-function notify_attendee( $post) {
-    //if NOT post type 'grower_posts' then exit;
- if(( $_POST['post_status'] == 'publish' ) && ( $_POST['original_post_status'] != 'publish' ) && get_post_type($post_id) == 'task')  {    
-
-    //if email not sent then get an array of users to email
-   
-      global $post;
-     // $author_id = $post->post_author;
-     // $author_email = get_the_author_meta( 'user_email', $author_id );
-     // $completed = get_field('completed', $post_id);
-     // $approved = get_field('confirmed_by_supervisor', $post_id);
-    // if ($completed == 'true' && $approved != 'true') {
-       $users = get_field('assigned_to', $post_id);
-       $attendee = get_field('form_for', $post_id);
-       $attendee_email = $attendee[user_email];
-   
-    //if $specific_users is an array and is not empty then send email. 
-       
-            $to = $attendee_email;
-
-            $subject = 'You were assigned as attendee in the SW Culture Portal';
-            $message .= '<p>This is an automatic notification that you have been selected as the attendee for the task below.</p>';
-            $message .= '<p><strong>Task Name: </strong>' . get_the_title($post_id) . '</p>';
-            $message .= '<p><strong>Task Type: </strong>' . get_field('form_task', $post_id) . '</p>';
-
-            $message .= '<p><strong>Deadline:</strong>' . get_field('end_date', $post_id) . '</p>';
-            $message .= '<p><strong>Task Details:</strong>' . get_field('task_description', $post_id) . '</p>';
-             $message .= '<p><a href="' . get_permalink($post_id) . '"><strong>View Task &raquo;</strong></a></p>';
-           
-            wp_mail($to, $subject, $message );
-        
-      
-    // }
+    }
   }
 }
 
 class PageTemplater {
 
-	/**
-	 * A reference to an instance of this class.
-	 */
-	private static $instance;
+  /**
+   * A reference to an instance of this class.
+   */
+  private static $instance;
 
-	/**
-	 * The array of templates that this plugin tracks.
-	 */
-	protected $templates;
+  /**
+   * The array of templates that this plugin tracks.
+   */
+  protected $templates;
 
-	/**
-	 * Returns an instance of this class. 
-	 */
-	public static function get_instance() {
+  /**
+   * Returns an instance of this class. 
+   */
+  public static function get_instance() {
 
-		if ( null == self::$instance ) {
-			self::$instance = new PageTemplater();
-		} 
+    if ( null == self::$instance ) {
+      self::$instance = new PageTemplater();
+    } 
 
-		return self::$instance;
+    return self::$instance;
 
-	} 
+  } 
 
-	/**
-	 * Initializes the plugin by setting filters and administration functions.
-	 */
-	private function __construct() {
+  /**
+   * Initializes the plugin by setting filters and administration functions.
+   */
+  private function __construct() {
 
-		$this->templates = array();
-
-
-		// Add a filter to the attributes metabox to inject template into the cache.
-		if ( version_compare( floatval( get_bloginfo( 'version' ) ), '4.7', '<' ) ) {
-
-			// 4.6 and older
-			add_filter(
-				'page_attributes_dropdown_pages_args',
-				array( $this, 'register_project_templates' )
-			);
-
-		} else {
-
-			// Add a filter to the wp 4.7 version attributes metabox
-			add_filter(
-				'theme_page_templates', array( $this, 'add_new_template' )
-			);
-
-		}
-
-		// Add a filter to the save post to inject out template into the page cache
-		add_filter(
-			'wp_insert_post_data', 
-			array( $this, 'register_project_templates' ) 
-		);
+    $this->templates = array();
 
 
-		// Add a filter to the template include to determine if the page has our 
-		// template assigned and return it's path
-		add_filter(
-			'template_include', 
-			array( $this, 'view_project_template') 
-		);
+    // Add a filter to the attributes metabox to inject template into the cache.
+    if ( version_compare( floatval( get_bloginfo( 'version' ) ), '4.7', '<' ) ) {
+
+      // 4.6 and older
+      add_filter(
+        'page_attributes_dropdown_pages_args',
+        array( $this, 'register_project_templates' )
+      );
+
+    } else {
+
+      // Add a filter to the wp 4.7 version attributes metabox
+      add_filter(
+        'theme_page_templates', array( $this, 'add_new_template' )
+      );
+
+    }
+
+    // Add a filter to the save post to inject out template into the page cache
+    add_filter(
+      'wp_insert_post_data', 
+      array( $this, 'register_project_templates' ) 
+    );
 
 
-		// Add your templates to this array.
-		$this->templates = array(
-				
-				'templates/all-upcoming.php' => 'All Upcoming (Created by Custom Task List Plugin)',
+    // Add a filter to the template include to determine if the page has our 
+    // template assigned and return it's path
+    add_filter(
+      'template_include', 
+      array( $this, 'view_project_template') 
+    );
+
+
+    // Add your templates to this array.
+    $this->templates = array(
+        
+        'templates/all-upcoming.php' => 'All Upcoming (Created by Custom Task List Plugin)',
         'templates/all-people.php' => 'All People (Created by Custom Task List Plugin)',
-        'templates/all-combined.php' => 'All Combined Tasks (Created by Custom Task List Plugin)',
 
-		);
-			
-	} 
+    );
+      
+  } 
 
-	/**
-	 * Adds our template to the page dropdown for v4.7+
-	 *
-	 */
-	public function add_new_template( $posts_templates ) {
-		$posts_templates = array_merge( $posts_templates, $this->templates );
-		return $posts_templates;
-	}
+  /**
+   * Adds our template to the page dropdown for v4.7+
+   *
+   */
+  public function add_new_template( $posts_templates ) {
+    $posts_templates = array_merge( $posts_templates, $this->templates );
+    return $posts_templates;
+  }
 
-	/**
-	 * Adds our template to the pages cache in order to trick WordPress
-	 * into thinking the template file exists where it doens't really exist.
-	 */
-	public function register_project_templates( $atts ) {
+  /**
+   * Adds our template to the pages cache in order to trick WordPress
+   * into thinking the template file exists where it doens't really exist.
+   */
+  public function register_project_templates( $atts ) {
 
-		// Create the key used for the themes cache
-		$cache_key = 'page_templates-' . md5( get_theme_root() . '/' . get_stylesheet() );
+    // Create the key used for the themes cache
+    $cache_key = 'page_templates-' . md5( get_theme_root() . '/' . get_stylesheet() );
 
-		// Retrieve the cache list. 
-		// If it doesn't exist, or it's empty prepare an array
-		$templates = wp_get_theme()->get_page_templates();
-		if ( empty( $templates ) ) {
-			$templates = array();
-		} 
+    // Retrieve the cache list. 
+    // If it doesn't exist, or it's empty prepare an array
+    $templates = wp_get_theme()->get_page_templates();
+    if ( empty( $templates ) ) {
+      $templates = array();
+    } 
 
-		// New cache, therefore remove the old one
-		wp_cache_delete( $cache_key , 'themes');
+    // New cache, therefore remove the old one
+    wp_cache_delete( $cache_key , 'themes');
 
-		// Now add our template to the list of templates by merging our templates
-		// with the existing templates array from the cache.
-		$templates = array_merge( $templates, $this->templates );
+    // Now add our template to the list of templates by merging our templates
+    // with the existing templates array from the cache.
+    $templates = array_merge( $templates, $this->templates );
 
-		// Add the modified cache to allow WordPress to pick it up for listing
-		// available templates
-		wp_cache_add( $cache_key, $templates, 'themes', 1800 );
+    // Add the modified cache to allow WordPress to pick it up for listing
+    // available templates
+    wp_cache_add( $cache_key, $templates, 'themes', 1800 );
 
-		return $atts;
+    return $atts;
 
-	} 
+  } 
 
-	/**
-	 * Checks if the template is assigned to the page
-	 */
-	public function view_project_template( $template ) {
-		
-		// Get global post
-		global $post;
+  /**
+   * Checks if the template is assigned to the page
+   */
+  public function view_project_template( $template ) {
+    
+    // Get global post
+    global $post;
 
-		// Return template if post is empty
-		if ( ! $post ) {
-			return $template;
-		}
+    // Return template if post is empty
+    if ( ! $post ) {
+      return $template;
+    }
 
-		// Return default template if we don't have a custom one defined
-		if ( ! isset( $this->templates[get_post_meta( 
-			$post->ID, '_wp_page_template', true 
-		)] ) ) {
-			return $template;
-		} 
+    // Return default template if we don't have a custom one defined
+    if ( ! isset( $this->templates[get_post_meta( 
+      $post->ID, '_wp_page_template', true 
+    )] ) ) {
+      return $template;
+    } 
 
-		$file = plugin_dir_path( __FILE__ ). get_post_meta( 
-			$post->ID, '_wp_page_template', true
-		);
+    $file = plugin_dir_path( __FILE__ ). get_post_meta( 
+      $post->ID, '_wp_page_template', true
+    );
 
-		// Just to be safe, we check if the file exist first
-		if ( file_exists( $file ) ) {
-			return $file;
-		} else {
-			echo $file;
-		}
+    // Just to be safe, we check if the file exist first
+    if ( file_exists( $file ) ) {
+      return $file;
+    } else {
+      echo $file;
+    }
 
-		// Return template
-		return $template;
+    // Return template
+    return $template;
 
-	}
+  }
 
 } 
 add_action( 'plugins_loaded', array( 'PageTemplater', 'get_instance' ) );

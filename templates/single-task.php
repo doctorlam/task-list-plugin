@@ -17,18 +17,11 @@ get_header(); ?>
 				<?php while ( have_posts() ) : the_post(); ?>
 				<?php 
 			 global $current_user;
-			 wp_get_current_user();
+			 get_currentuserinfo();
 			  $current = $current_user->ID;
 			  $post_author_id = get_post_field( 'post_author', $post_id );
-  				$users = get_field('assigned_to');
-  				$attendee = get_field('form_for');
-  				$supervisor = get_field('supervisor');
-  			
-  		
-			  if ( in_array($current, $users) || $supervisor[ID] == $current  || $attendee[ID] == $current ):?>
-  			
-
-
+			  $assigned = get_field('assigned_to');
+			  if ( in_array($current, $assigned ) || $post_author_id == $current ) :?>
 			<div class="grid-70">
 
 						<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -61,53 +54,14 @@ get_header(); ?>
 	                    
 	                    <?php endif;?>
 	            </div><!-- d-flex-->
-
-	              <?php 
-                 global $current_user;
-                wp_get_current_user();
-                $current = $current_user->ID;
-                $tasktype = get_field('form_task');
-                $supervisor = get_field('supervisor');
-                $attendee = get_field('form_for');
-                $reviewers = get_field('assigned_to');
-
-               if($tasktype == 'Quarterly Conversation' && $current == $supervisor[ID]) : ?>
-                   <h1 style="margin-right: 24px">Quarterly Conversation</h1>
-
-              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee[ID]) : ?> <h1 style="margin-right: 24px">Quarterly Conversation</h1>
-                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor[ID]) : ?> <h1 style="margin-right: 24px">Annual Review</h1>
-                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee[ID]) : ?> <h1 style="margin-right: 24px">Annual Review</h1>
-
-                 <?php elseif($tasktype == 'Quarterly Conversation' || 'Annual Review' && in_array($current,$reviewers)) : ?> <h1 style="margin-right: 24px">People Analyzer</h1>
-
-                <?php else : ?>
-
-                <h1 style="margin-right: 24px"><?php the_title(); ?></h1>
-
-                <?php endif; ?>
-
+					<h1 style="margin-right: 24px"><?php the_title(); ?></h1>
 				<?php
 		$user = get_field('assigned_to');
 		
 		if( $user ): ?>
 		<h3>Assigned to:
 				
-		     <?php
-$users = get_field("assigned_to");
-
-if( $users ): ?>
-<ul class="volunteers-list">
-    <?php foreach( $users as $user ): 
-    $user_info = get_userdata( $user );
-
-    	?>
-    	
-        <li>
-		       <?php echo $user_info->display_name; ?>
-        </li>
-    <?php endforeach; ?>
-</ul>
-<?php endif; ?>
+		     <?php echo $user['display_name']; ?>
 		   
 		        
 		</h3>
@@ -117,55 +71,14 @@ if( $users ): ?>
 		<p><span style="font-weight: 700">Deadline:</span> <?php the_field('end_date') ;?></p>
 		<br>
 		<?php the_field('task_description'); ?>
-		<?php 
-		$attendee = get_field('form_for');
-		$attendeeid = $attendee[ID];
- 		 $user_id = $attendeeid;
-  		$key = 'dept_multidropdown';
-  			$departments = get_user_meta( $user_id, $key, true ); 
- 			foreach( $departments as $department ) {
- 				if ($department == 'Customer Service') {
- 					echo 'CS';
- 				}
- 				elseif ($department == 'Accounting') {
- 					echo 'Accounting';
- 				}
- 				elseif ($department == 'Billing') {
- 					echo 'Billing';
- 				}
- 				elseif ($department == 'Window Coverings') {
- 					echo 'Window';
- 				}
- 				elseif ($department == 'Designers') {
- 					echo 'Designers';
- 				}
- 				elseif ($department == 'Wood FS') {
- 					echo 'Wood';
- 				}
- 				elseif ($department == 'Purchasing') {
- 					echo 'Purchase';
- 				}
- 				elseif ($department == 'Resolution') {
- 					echo 'Resolution';
- 				}
- 				elseif ($department == 'Warehouse') {
- 					echo 'Warehouse';
- 				}
- 				elseif ($department == 'Digitizing') {
- 					echo 'Dig';
- 				}
- 				elseif ($department == 'Sales') {
- 					echo 'Sales';
- 				}
- 				elseif ($department == 'Field Service') {
- 					echo 'Field';
- 				}
- 			}
+		<?php $form_task = get_field('form_task');
+			$formuser = get_field('form_for');
 
-
-		?>
-
-
+			if( $form_task == 'people_analyzers' ) :?>
+				<a class="people-analyzers-form" href="/people-analyzer">People Analyzer for <?php echo $formuser['display_name']; ?></a>
+		<?php elseif( $form_task == 'annual_review' ) :?>
+				<a class="annual-review-form" href="/annual-review">Annual Review for <?php echo $formuser['display_name']; ?></a>
+		<?php endif; ?>
 				
 			</header>
 
@@ -178,14 +91,11 @@ if( $users ): ?>
 	<div class="grid-30">
 		<?php 
 			 global $current_user;
-			 wp_get_current_user();
+			 get_currentuserinfo();
 			  $current = $current_user->ID;
 			  $post_author_id = get_post_field( 'post_author', $post_id );
 			  $assigned = get_field('assigned_to');
-			  if ( $post_author_id != $current || $superid != $current ) :?>
-	<?php 
-		$tasktype = get_field('form_task');
-		if ($tasktype == 'net_promoter_score') : ?>
+			  if ( $post_author_id != $current ) :?>
 		<div class="white-bg">
 			<h3>Have you completed this task?</h3>
 				
@@ -197,17 +107,16 @@ if( $users ): ?>
 				)); ?>
 		</div><!-- white-bg-->
 	<?php endif; ?>
-	<?php endif; ?>
 
 	<?php 
 	    global $current_user;
 		wp_get_current_user();
 		$post_author_id = get_post_field( 'post_author', $post_id );
-		$supervisor = get_field('supervisor');
+		$user = get_field('assigned_to');
 
-	if ($current_user->ID == $supervisor[ID]) :?>
+	if ($current_user->ID == $post_author_id) :?>
 		<div class="blue-bg">
-			<h3>Has everyone assigned completed this task?</h3>
+			<h3>Has <?php echo $user['display_name']; ?> completed this task?</h3>
 
 	   		<?php acf_form(array(
 				    'post_id'   => $post_id,
@@ -222,12 +131,9 @@ if( $users ): ?>
 
 
 	</div><!-- grid-30-->
-
 	<?php else :?>
 		<p>This task is not associated with your account.</p>
-	
 		<?php endif; ?>
-
 		<?php endwhile; // end of the loop. ?>
 		
 
