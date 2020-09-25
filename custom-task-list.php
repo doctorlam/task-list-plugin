@@ -138,6 +138,7 @@ acf_add_local_field_group(
       'label' => 'Supervisor',
       'name' => 'supervisor',
       'type' => 'user',
+      'return_format'=> 'object',
      // 'role' => 'supervisor',
       'conditional_logic' => 
       array(
@@ -167,6 +168,8 @@ acf_add_local_field_group(
       'label' => 'Attendee?',
       'name' => 'form_for',
       'type' => 'user',
+       'return_format'=> 'object',
+
 
       'conditional_logic' => 
       array(
@@ -309,21 +312,21 @@ function user_task_list_upcoming() {
             <table class="task-list-table upcoming-table">
               <?php 
               while ($eq_query->have_posts()): $eq_query->the_post();
-                $current_date = date('Y-m-d');
+                $currentdate = date('Y-m-d');
                $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
                 $status = get_field('confirmed_by_supervisor');
                 $deadline = get_field('end_date');
               ?>
 <tr>
                   <td class="left">
-                     <?php if ($current_date<$deadlinecompare && $status == false) :?>
+                     <?php if ($currentdate<$deadlinecompare && $status == false) :?>
                      
                           <div class="graystatus">Incomplete</div>
                       <?php endif; ?>
-                    <?php if ($current_date>$deadlinecompare && $status == false):?>
+                    <?php if ($currentdate>$deadlinecompare && $status == false):?>
                       <div class="redstatus">Overdue</div>
                     <?php endif; ?>
-                    <?php if ($current_date == $deadlinecompare && $status == false) :?>
+                    <?php if ($currentdate == $deadlinecompare && $status == false) :?>
                           <div class="yellowstatus">Due Today</div>
                   <?php endif; ?>
                 <?php if ($status == true) : ?>
@@ -351,19 +354,7 @@ function user_task_list_upcoming() {
     </div>-->
   </div> <!-- whole -->
 
-<!--<script>
- jQuery(function($) {
-    $('.whole-thing').on('click', '.upcoming-table-link a', function(e){
-        e.preventDefault();
-        var link = $(this).attr('href');
-        $('.whole-thing').fadeOut(100, function(){
-            $(this).load(link + ' .whole-thing', function() {
-                $(this).fadeIn(100);
-            });
-        });
-    });
-});
-</script> -->
+
      <?php elseif (is_user_logged_in() ) :?>
         <p style="font-size: 14px;">There are no tasks currently assigned to you.</p>
        <?php else :?>
@@ -416,21 +407,21 @@ function user_task_list_people() {
             <table class="task-list-table people-table">
               <?php 
               while ($eq_query->have_posts()): $eq_query->the_post();
-                $current_date = date('Y-m-d');
+                $currentdate = date('Y-m-d');
                $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
                 $status = get_field('completed');
                 $deadline = get_field('end_date');
               ?>
                 <tr>
                   <td class="left">
-                     <?php if ($current_date<$deadlinecompare && $status == false) :?>
+                     <?php if ($currentdate<$deadlinecompare && $status == false) :?>
                      
                           <div class="graystatus">Incomplete</div>
                       <?php endif; ?>
-                    <?php if ($current_date>$deadlinecompare && $status == false):?>
+                    <?php if ($currentdate>$deadlinecompare && $status == false):?>
                       <div class="redstatus">Overdue</div>
                     <?php endif; ?>
-                    <?php if ($current_date == $deadlinecompare && $status == false) :?>
+                    <?php if ($currentdate == $deadlinecompare && $status == false) :?>
                           <div class="yellowstatus">Due Today</div>
                   <?php endif; ?>
                 <?php if ($status == true) : ?>
@@ -514,21 +505,21 @@ function user_task_list_combined() {
             <table class="task-list-table people-table">
               <?php 
               while ($eq_query->have_posts()): $eq_query->the_post();
-                $current_date = date('Y-m-d');
+                $currentdate = date('Y-m-d');
                $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
-                $status = get_field('completed');
+                $status = get_field('confirmed_by_supervisor');
                 $deadline = get_field('end_date');
               ?>
                 <tr>
                   <td class="left">
-                     <?php if ($current_date<$deadlinecompare && $status == false) :?>
+                     <?php if ($currentdate<$deadlinecompare && $status == false) :?>
                      
                           <div class="graystatus">Incomplete</div>
                       <?php endif; ?>
-                    <?php if ($current_date>$deadlinecompare && $status == false):?>
+                    <?php if ($currentdate>$deadlinecompare && $status == false):?>
                       <div class="redstatus">Overdue</div>
                     <?php endif; ?>
-                    <?php if ($current_date == $deadlinecompare && $status == false) :?>
+                    <?php if ($currentdate == $deadlinecompare && $status == false) :?>
                           <div class="yellowstatus">Due Today</div>
                   <?php endif; ?>
                 <?php if ($status == true) : ?>
@@ -547,21 +538,21 @@ function user_task_list_combined() {
                 $attendee = get_field('form_for');
                 $reviewers = get_field('assigned_to');
 
-               if($tasktype == 'Quarterly Conversation' && $current == $supervisor[ID]) : ?>
+               if($tasktype == 'Quarterly Conversation' && $current == $supervisor->ID) : ?>
                   <h5>Quarterly Conversation  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
                   </h5>
 
-              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee[ID]) : ?><h5>Quarterly Conversation  <br>
+              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee->ID) : ?><h5>Quarterly Conversation  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
                   </h5>
-                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor[ID]) : ?><h5>Annual Review  <br>
+                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor->ID) : ?><h5>Annual Review  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
                   </h5>
-                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee[ID]) : ?><h5>Annual Review  <br>
+                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee->ID) : ?><h5>Annual Review  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
                   </h5>
@@ -584,7 +575,11 @@ function user_task_list_combined() {
                  </td>
                    
                 </tr>
-            <?php endwhile; wp_reset_query(); ?> 
+
+            <?php endwhile; 
+wp_reset_query();
+
+             ?> 
             </table>
       <!-- <div class="people-table-link">
 
@@ -604,61 +599,7 @@ $content = ob_get_clean();
 
 add_shortcode('user_task_list_combined', 'user_task_list_combined'); ?>
 
-
 <?php
-
-
-function misha_my_load_more_scripts() {
- 
-  global $wp_query; 
- 
-  // In most cases it is already included on the page and this line can be removed
-  wp_enqueue_script('jquery');
- 
-  // register our main script but do not enqueue it yet
-  wp_register_script( 'my_loadmore', plugin_dir_url( __FILE__ ) . 'js/myloadmore.js', array('jquery') );
- 
-
- 
-  wp_enqueue_script( 'my_loadmore' );
-}
- 
-add_action( 'wp_enqueue_scripts', 'misha_my_load_more_scripts' );
-
-
-
-
-function misha_loadmore_ajax_handler(){
- 
-  // prepare our arguments for the query
-  $args = json_decode( stripslashes( $_POST['query'] ), true );
-  $args['paged'] = $_POST['page'] + 1; // we need next page to be loaded
-  $args['post_status'] = 'publish';
- 
-  // it is always better to use WP_Query but not here
-  query_posts( $args );
- 
-  if( have_posts() ) :
- 
-    // run the loop
-    while( have_posts() ): ?>
-    <?php the_post(); ?>
-     <?php the_title(); ?>
- 
- 
-  <?php  endwhile; ?>
-<?php
- 
-  endif;
-  die; // here we exit the script and even no wp_reset_query() required!
-}
- 
- 
-
-  
-add_action('wp_ajax_loadmore', 'misha_loadmore_ajax_handler'); // wp_ajax_{action}
-add_action('wp_ajax_nopriv_loadmore', 'misha_loadmore_ajax_handler'); // wp_ajax_nopriv_{action}
-
 
  function wpse27856_set_content_type(){
     return "text/html";
@@ -713,7 +654,7 @@ function notify_admin( $post) {
     // if ($completed == 'true' && $approved != 'true') {
        $users = get_field('assigned_to', $post_id);
        $supervisor = get_field('supervisor', $post_id);
-       $super_email = $supervisor[user_email];
+       $super_email = $supervisor->user_email;
    
     //if $specific_users is an array and is not empty then send email. 
        
@@ -751,7 +692,7 @@ function notify_attendee( $post) {
     // if ($completed == 'true' && $approved != 'true') {
        $users = get_field('assigned_to', $post_id);
        $attendee = get_field('form_for', $post_id);
-       $attendee_email = $attendee[user_email];
+       $attendee_email = $attendee->user_email;
    
     //if $specific_users is an array and is not empty then send email. 
        

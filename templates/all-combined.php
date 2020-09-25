@@ -92,21 +92,21 @@
                 $attendee = get_field('form_for');
                 $reviewers = get_field('assigned_to');
 
-               if($tasktype == 'Quarterly Conversation' && $current == $supervisor[ID]) : ?>
+               if($tasktype == 'Quarterly Conversation' && $current == $supervisor->ID) : ?>
                   <h5>Quarterly Conversation  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
                   </h5>
 
-              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee[ID]) : ?><h5>Quarterly Conversation  <br>
+              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee->ID) : ?><h5>Quarterly Conversation  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
                   </h5>
-                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor[ID]) : ?><h5>Annual Review  <br>
+                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor->ID) : ?><h5>Annual Review  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
                   </h5>
-                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee[ID]) : ?><h5>Annual Review  <br>
+                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee->ID) : ?><h5>Annual Review  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
                   </h5>
