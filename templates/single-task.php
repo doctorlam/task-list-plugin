@@ -15,17 +15,27 @@ get_header(); ?>
 
 	<div id="primary" class="grid-container site-content" role="main">
 				<?php while ( have_posts() ) : the_post(); ?>
-				<?php 
+				
+  			<?php 
 			 global $current_user;
 			 wp_get_current_user();
+			 $post_author_id = get_post_field( 'post_author', $post_id );
+
 			  $current = $current_user->ID;
-			  $post_author_id = get_post_field( 'post_author', $post_id );
-  				$users = get_field('assigned_to');
+  				$reviewers = get_field('assigned_to');
   				$attendee = get_field('form_for');
   				$supervisor = get_field('supervisor');
-  			
-  		
-			  if ( in_array($current, $users) || $supervisor[ID] == $current  || $attendee[ID] == $current ):?>
+  				$currentdate = date('Y-m-d');
+	               $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
+	                $status = get_field('completed');
+	                $deadline = get_field('end_date');
+	                $confirmed = get_field('confirmed_by_supervisor');
+                $tasktype = get_field('form_task');
+
+
+  				 ?>
+  	
+			 <?php if ( in_array($current, $reviewers) || $supervisor->ID == $current  || $attendee->ID == $current || $post_author_id == $current ):?>
   			
 
 
@@ -34,21 +44,16 @@ get_header(); ?>
 						<article id="post-<?php the_ID(); ?>">
 			<header class="white-bg">
 				<div style="display:flex; align-items: center">
-					<?php  $current_date = date('Y-m-d');
-	               $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
-	                $status = get_field('completed');
-	                $deadline = get_field('end_date');
-	                $confirmed = get_field('confirmed_by_supervisor');
-	                ?>
 
-	                <?php if ($current_date<$deadlinecompare && $confirmed == false) :?>
+
+	                <?php if ($currentdate<$deadlinecompare && $confirmed == false) :?>
 	                     
 	                          <div class="graystatus button">Incomplete</div>
 	                      <?php endif; ?>
-	                    <?php if ($current_date>$deadlinecompare && $confirmed == false):?>
+	                    <?php if ($currentdate>$deadlinecompare && $confirmed == false):?>
 	                      <div class="redstatus button">Overdue</div>
 	                    <?php endif; ?>
-	                    <?php if ($current_date == $deadlinecompare && $confirmed == false) :?>
+	                    <?php if ($currentdate == $deadlinecompare && $confirmed == false) :?>
 	                          <div class="yellowstatus button">Due Today</div>
 	                  <?php endif; ?>
 	                <?php if ($status == true && $confirmed == false)  : ?>
@@ -62,21 +67,14 @@ get_header(); ?>
 	                    <?php endif;?>
 	            </div><!-- d-flex-->
 
-	              <?php 
-                 global $current_user;
-                wp_get_current_user();
-                $current = $current_user->ID;
-                $tasktype = get_field('form_task');
-                $supervisor = get_field('supervisor');
-                $attendee = get_field('form_for');
-                $reviewers = get_field('assigned_to');
-
-               if($tasktype == 'Quarterly Conversation' && $current == $supervisor[ID]) : ?>
+	         <!-- changing title for different roles-->     
+	         <?php 
+               if($tasktype == 'Quarterly Conversation' && $current == $supervisor->ID) : ?>
                    <h1 style="margin-right: 24px">Quarterly Conversation</h1>
 
-              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee[ID]) : ?> <h1 style="margin-right: 24px">Quarterly Conversation</h1>
-                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor[ID]) : ?> <h1 style="margin-right: 24px">Annual Review</h1>
-                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee[ID]) : ?> <h1 style="margin-right: 24px">Annual Review</h1>
+              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee->ID) : ?> <h1 style="margin-right: 24px">Quarterly Conversation</h1>
+                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor->ID) : ?> <h1 style="margin-right: 24px">Annual Review</h1>
+                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee->ID) : ?> <h1 style="margin-right: 24px">Annual Review</h1>
 
                  <?php elseif($tasktype == 'Quarterly Conversation' || 'Annual Review' && in_array($current,$reviewers)) : ?> <h1 style="margin-right: 24px">People Analyzer</h1>
 
@@ -86,21 +84,10 @@ get_header(); ?>
 
                 <?php endif; ?>
                <?php if ($tasktype == 'Annual Review' || $tasktype == 'Quarterly Conversation') :?>
-               			<p><span style="font-weight: 700">Supervisor:</span> <?php $supervisor = get_field('supervisor'); echo $supervisor[display_name]; ?></p>
-               			<p><span style="font-weight: 700">Attendee:</span> <?php $attendee = get_field('form_for'); echo $attendee[display_name]; ?></p>
-               			<?php $attendee = get_field('form_for');
-					$attendeeid = $attendee[ID];
- 		
-  					$key = 'dept_multidropdown';
-  					$tasktype = get_field('form_task');
-  					$departments = get_user_meta( $attendeeid, $key, true ); ?>
-			  		<?php
-				 			foreach( $departments as $department ) : ?>
-				 				<p><span style="font-weight: 700">Attendee Department:</span> <?php echo $department; ?></p>
-
-			 		<?php endforeach; ?>
-
-
+               			<p><span style="font-weight: 700">Supervisor:</span> <?php $supervisor = get_field('supervisor'); echo $supervisor->display_name; ?></p>
+               			<p><span style="font-weight: 700">Attendee:</span> <?php $attendee = get_field('form_for'); echo $attendee->display_name; ?></p>
+               		
+  		
 
                <?php endif; ?>
 
@@ -115,13 +102,10 @@ get_header(); ?>
 		<p><span style="font-weight: 700">Assigned to:</span>
 	<?php endif; ?>
 				
-		     <?php
-$users = get_field("assigned_to");
-
-if( $users ): ?>
+		     <?php if( $reviewers ): ?>
 <ul class="volunteers-list">
-    <?php foreach( $users as $user ): 
-    $user_info = get_userdata( $user );
+    <?php foreach( $reviewers as $reviewer ): 
+    $user_info = get_userdata( $reviewer );
 
     	?>
     	
@@ -141,121 +125,17 @@ if( $users ): ?>
 		<br>
 
 			<?php  the_field('task_description'); ?>
+			<!-- change form links-->
 
-		<?php 
-		$attendee = get_field('form_for');
-		$attendeeid = $attendee[ID];
- 		 $user_id = $attendeeid;
-  		$key = 'dept_multidropdown';
-  		$tasktype = get_field('form_task');
-  			$departments = get_user_meta( $user_id, $key, true ); ?>
-  		<?php
- 			foreach( $departments as $department ) : ?>
- 				<?php if ($department == 'Customer Service') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/customer-service-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
+			<?php if ($tasktype == 'Annual Review') :?>
+ 						<a href="/annual-review/?coworker_name=<?php echo $attendee->display_name; ?>">Annual Review Link</a>
  					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/customer-service-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
+ 							<a href="/people-analyzer/?coworker_name=<?php echo $attendee->display_name; ?>">People Analyzer Link</a>
 
  					<?php endif; ?>
- 				<?php
- 				elseif ($department == 'Accounting') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/accounting-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/accounting-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
- 				<?php elseif ($department == 'Billing') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/billing-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/billing-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
-
- 				
- 			
- 				<?php elseif ($department == 'Window Coverings') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/window-coverings-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/window-coverings-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
-
- 			<?php
- 				elseif ($department == 'Design Studio') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/designers-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/designers-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
- 				<?php
- 				elseif ($department == 'Wood FS') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/wood-fs-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/wood-fs-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
- 				<?php
- 				elseif ($department == 'Purchasing') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/purchasing-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/purchasing-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
- 				<?php
- 				elseif ($department == 'Resolution') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/resolution-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/resolution-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
- 				<?php
- 				elseif ($department == 'Warehouse') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/warehouse-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/warehouse-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
- 				<?php
- 				elseif ($department == 'Digitizing') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/digitizing-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/digitizing-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
- 				<?php
- 				elseif ($department == 'Sales') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/sales-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/sales-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
- 				<?php
- 				elseif ($department == 'Field Services') :?>
- 					<?php if ($tasktype == 'Annual Review') :?>
- 						<a href="https://allin.southwesterninteriors.com/field-services-annual-review/?coworker_name=<?php echo $attendee['display_name']; ?>">Annual Review Link</a>
- 					<?php elseif($tasktype == 'Quarterly Conversation') :?>
- 							<a href="https://allin.southwesterninteriors.com/field-services-people-analyzer/?coworker_name=<?php echo $attendee['display_name']; ?>">People Analyzer Link</a>
-
- 					<?php endif; ?>
- 				<?php endif; ?>
- 			<?php endforeach; ?>
+	
 
 
-
-
-
-				
 			</header>
 
 	</article> <!-- /#post -->	
@@ -265,15 +145,8 @@ if( $users ): ?>
 
 		        
 	<div class="grid-30">
-		<?php 
-			 global $current_user;
-			 wp_get_current_user();
-			  $current = $current_user->ID;
-			  $post_author_id = get_post_field( 'post_author', $post_id );
-			  $assigned = get_field('assigned_to');
-			  if ( $post_author_id != $current || $superid != $current ) :?>
+		<?php if ( $post_author_id != $current || $supervisor->ID != $current ) :?>
 	<?php 
-		$tasktype = get_field('form_task');
 		if ($tasktype == 'net_promoter_score') : ?>
 		<div class="white-bg">
 			<h3>Have you completed this task?</h3>
@@ -285,16 +158,10 @@ if( $users ): ?>
 				    'submit_value'  => 'Submit'
 				)); ?>
 		</div><!-- white-bg-->
-	<?php endif; ?>
-	<?php endif; ?>
+	<?php endif; ?> <!-- if net promoter score-->
+	<?php endif; ?><!-- if not supervisor-->
 
-	<?php 
-	    global $current_user;
-		wp_get_current_user();
-		$post_author_id = get_post_field( 'post_author', $post_id );
-		$supervisor = get_field('supervisor');
-
-	if ($current_user->ID == $supervisor[ID]) :?>
+	<?php  if ($current == $supervisor->ID) :?>
 		<div class="blue-bg">
 			<h3>Has everyone assigned completed this task?</h3>
 
@@ -306,16 +173,14 @@ if( $users ): ?>
 				)); ?>
 		</div>
 
-<?php endif; ?>
-
-
+	<?php endif; ?><!-- if supervisor-->
 
 	</div><!-- grid-30-->
 
 	<?php else :?>
 		<p>This task is not associated with your account.</p>
 	
-		<?php endif; ?>
+	<?php endif; ?><!-- entire if statement showing to authorized users-->
 
 		<?php endwhile; // end of the loop. ?>
 		

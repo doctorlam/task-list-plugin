@@ -5,7 +5,7 @@
 
   global $current_user;
            wp_get_current_user();
-            $assigned = $current_user->ID;
+            $current = $current_user->ID;
             $paged = ( get_query_var('page') ) ? get_query_var('page') : 1;
             $args = array(
                 'post_type' => 'task', 
@@ -14,20 +14,22 @@
                   'meta_key'      => 'end_date',
                 'orderby'     => 'meta_value',
                 'order'       => 'ASC',
-                'tax_query' => array(
-                      array(
-                          'taxonomy' => 'list',
-                          'field' => 'slug',
-                          'terms' => 'upcoming-conversations'
-                      )
-                    ), // end tax query
-                   'meta_query' => array(
-                      array(
-                          'key' => 'assigned_to',
-                          'compare' => 'LIKE',
-                          'value' => $assigned
-                      )
-                    ), // end tax query
+             
+                'meta_query' => array(
+                    'relation' => 'AND',
+                     array (
+                               
+                            'key' => 'form_for',
+                            'compare' => 'LIKE',
+                            'value' => $current,
+                                ),
+                      array (
+                          'key' => 'form_task',
+                          'compare' => 'IN',
+                          'value' => array('annual_review', 'quarterly_conversation'),
+                      
+                      ), // AND array ends here
+                    ), // Entire meta query ends here  
                   'paged' => $paged, 
 
 
@@ -52,21 +54,21 @@
             <table class="task-list-table upcoming-table">
               <?php 
               while ($eq_query->have_posts()): $eq_query->the_post();
-                $current_date = date('Y-m-d');
+                $currentdate = date('Y-m-d');
                $deadlinecompare = date('Y-m-d', strtotime(get_field('end_date')));
                 $status = get_field('confirmed_by_supervisor');
                 $deadline = get_field('end_date');
               ?>
 <tr>
                   <td class="left">
-                     <?php if ($current_date<$deadlinecompare && $status == false) :?>
+                     <?php if ($currentdate<$deadlinecompare && $status == false) :?>
                      
                           <div class="graystatus">Incomplete</div>
                       <?php endif; ?>
-                    <?php if ($current_date>$deadlinecompare && $status == false):?>
+                    <?php if ($currentdate>$deadlinecompare && $status == false):?>
                       <div class="redstatus">Overdue</div>
                     <?php endif; ?>
-                    <?php if ($current_date == $deadlinecompare && $status == false) :?>
+                    <?php if ($currentdate == $deadlinecompare && $status == false) :?>
                           <div class="yellowstatus">Due Today</div>
                   <?php endif; ?>
                 <?php if ($status == true) : ?>
@@ -74,12 +76,47 @@
 
                 <?php endif; ?>
                </td>
-                  <td class="right"><a href="<?php the_permalink(); ?>"><h5><?php the_title(); ?><br>
+                  <td class="right">             <a href="<?php the_permalink(); ?>">
+                  <?php 
+             
+                $tasktype = get_field('form_task');
+                $supervisor = get_field('supervisor');
+                $attendee = get_field('form_for');
+                $reviewers = get_field('assigned_to');
+
+               if($tasktype == 'Quarterly Conversation' && $current == $supervisor->ID) : ?>
+                  <h5>Quarterly Conversation  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
-                
                     
-                  </h5></a>  
-               
+                  </h5>
+
+              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee->ID) : ?><h5>Quarterly Conversation  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor->ID) : ?><h5>Annual Review  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee->ID) : ?><h5>Annual Review  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+
+                 <?php elseif($tasktype == 'Quarterly Conversation' || 'Annual Review' && in_array($current,$reviewers)) : ?><h5>People Analyzer  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+
+                <?php else : ?>
+
+                  <h5><?php the_title(); ?>  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                <?php endif; ?>
+
+                </a>  
                  </td>
                    
                 </tr>             
