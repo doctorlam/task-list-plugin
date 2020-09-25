@@ -2,7 +2,7 @@
 /*
   Plugin Name: Custom Task manager for AM
   Description: Custom Task manager for AM
-  Version: 2.0
+  Version: 3.0
   Author: Chris Lam Design
 */
 
@@ -329,10 +329,50 @@ function user_task_list_upcoming() {
                 <?php endif; ?>
                </td>
 
-                  <td class="right"><a href="<?php the_permalink(); ?>"><h5><?php the_title(); ?><br>
+                  <td class="right"> 
+                       <a href="<?php the_permalink(); ?>">
+                <?php 
+                 global $current_user;
+                wp_get_current_user();
+                $current = $current_user->ID;
+                $tasktype = get_field('form_task');
+                $supervisor = get_field('supervisor');
+                $attendee = get_field('form_for');
+                $reviewers = get_field('assigned_to');
+
+               if($tasktype == 'Quarterly Conversation' && $current == $supervisor->ID) : ?>
+                  <h5>Quarterly Conversation  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
-                  </h5></a>  
+                  </h5>
+
+              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee->ID) : ?><h5>Quarterly Conversation  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor->ID) : ?><h5>Annual Review  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee->ID) : ?><h5>Annual Review  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+
+                 <?php elseif($tasktype == 'Quarterly Conversation' || 'Annual Review' && in_array($current,$reviewers)) : ?><h5>People Analyzer  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+
+                <?php else : ?>
+
+                  <h5><?php the_title(); ?>  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                <?php endif; ?>
+
+                  </a>  
                
                  </td>
                    
@@ -423,10 +463,50 @@ function user_task_list_people() {
 
                 <?php endif; ?>
                </td>
-                  <td class="right"><a href="<?php the_permalink(); ?>"><h5><?php the_title(); ?><br>
+                  <td class="right">  
+                       <a href="<?php the_permalink(); ?>">
+                <?php 
+                 global $current_user;
+                wp_get_current_user();
+                $current = $current_user->ID;
+                $tasktype = get_field('form_task');
+                $supervisor = get_field('supervisor');
+                $attendee = get_field('form_for');
+                $reviewers = get_field('assigned_to');
+
+               if($tasktype == 'Quarterly Conversation' && $current == $supervisor->ID) : ?>
+                  <h5>Quarterly Conversation  <br>
                     <span class="deadline"><?php echo $deadline; ?></span>
                     
-                  </h5></a>  
+                  </h5>
+
+              <?php elseif($tasktype == 'Quarterly Conversation' && $current == $attendee->ID) : ?><h5>Quarterly Conversation  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                <?php elseif($tasktype == 'Annual Review' && $current == $supervisor->ID) : ?><h5>Annual Review  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                    <?php elseif($tasktype == 'Annual Review' && $current == $attendee->ID) : ?><h5>Annual Review  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+
+                 <?php elseif($tasktype == 'Quarterly Conversation' || 'Annual Review' && in_array($current,$reviewers)) : ?><h5>People Analyzer  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+
+                <?php else : ?>
+
+                  <h5><?php the_title(); ?>  <br>
+                    <span class="deadline"><?php echo $deadline; ?></span>
+                    
+                  </h5>
+                <?php endif; ?>
+
+                  </a>  
                
                  </td>
                    
